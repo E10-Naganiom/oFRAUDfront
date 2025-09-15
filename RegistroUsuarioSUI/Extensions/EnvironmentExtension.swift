@@ -10,5 +10,4 @@ import SwiftUICore
 
 extension EnvironmentValues {
     @Entry var authController = AuthenticationController(httpClient: HTTPClient())
-    @Entry var profileController = ProfileController(httpClient: HTTPClient())
 }

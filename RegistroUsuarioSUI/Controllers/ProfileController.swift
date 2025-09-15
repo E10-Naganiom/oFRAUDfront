@@ -2,27 +2,24 @@
 //  ProfileController.swift
 //  RegistroUsuario452
 //
-//  Created by José Molina on 12/09/25.
+//  Created by Gabriel gUTIERREZ on 12/09/25.
 //
 
 import Foundation
+import Combine
 
 struct ProfileController {
-    let httpClient: HTTPClient
     
-    func getAllUsers() async throws -> [User] {
-        let users = try await httpClient.getUserList()
-        return users
+    private var profileClient = ProfileClient()
+    
+    init(profileClient: ProfileClient) {
+        self.profileClient = profileClient
     }
     
-    func getUserById(id: Int) async throws -> User {
-        let user = try await httpClient.getUserById(id: id)
-        return user
-    }
-    
-    func updateUser(id: Int, name: String?, email: String?, password: String?) async throws -> User {
-        let updateRequest = UpdateUserRequest(name: name, email: email, password: password)
-        let user = try await httpClient.updateUser(id: id, updateRequest: updateRequest)
-        return user
+    func getProfile() async throws -> Profile {
+        let accessToken = TokenStorage.get(identifier: "accessToken")
+        
+        let response = try await profileClient.getUserProfile(token: accessToken!)
+        return response.profile
     }
 }

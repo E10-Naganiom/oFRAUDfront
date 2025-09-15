@@ -8,11 +8,22 @@
 import Foundation
 
 struct TokenStorage {
-    static func set(identifier: String, value: String){
+    @discardableResult
+    static func set(identifier: String, value: String) -> Bool {
         UserDefaults.standard.set(value, forKey: identifier)
+        return true
     }
     
     static func get(identifier: String) -> String? {
         return UserDefaults.standard.string(forKey: identifier)
+    }
+    
+    @discardableResult
+    static func delete(identifier: String) -> Bool {
+        let existed = UserDefaults.standard.object(forKey: identifier) != nil
+        if existed {
+            UserDefaults.standard.removeObject(forKey: identifier)
+        }
+        return existed
     }
 }

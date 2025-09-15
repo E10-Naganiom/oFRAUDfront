@@ -8,8 +8,46 @@
 import SwiftUI
 
 struct HomeScreen: View {
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack {
+            TabView{
+                Tab{
+                    NavigationStack{
+                        Text("Pagina de estadisticas y de incidencias")
+                    }
+                }label:{
+                    Label("Inicio", systemImage:"house.and.flag")
+                }
+                Tab{
+                    NavigationStack{
+                        Text("Pagina historial")
+                    }
+                }label:{
+                    Label("Historial", systemImage: "clock.arrow.circlepath")
+                }
+                Tab{
+                    NavigationStack{
+                        Text("Pagina categorias")
+                    }
+                }label:{
+                    Label("Guias", systemImage: "book")
+                }
+                Tab{
+                    NavigationStack{
+                        Text("Pagina perfil del usuario")
+                        ProfileView()
+                        Button("Salir de  la sesion"){
+                            TokenStorage.delete(identifier: "accessToken")
+                            TokenStorage.delete(identifier: "refreshToken")
+                            isLoggedIn = false
+                        }
+                    }
+                }label: {
+                    Label("Perfil", systemImage: "person.crop.circle")
+                }
+            }
+        }
     }
 }
 

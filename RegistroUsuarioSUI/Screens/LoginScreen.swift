@@ -11,49 +11,52 @@ struct LoginScreen: View {
     @State var email: String = ""
     @State var password: String = ""
     @Environment(\.authController) var authenticationController
-    let onLoginSuccess: () -> Void
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     
     private func login() async {
         do{
-            let loginResult = try await authenticationController.loginUser(email: email, password: password)
-            if loginResult {
-                onLoginSuccess()
-            }
+            isLoggedIn = try await authenticationController.loginUser(email: email, password: password)
+            print("Usuario login exitoso \(isLoggedIn)")
         }catch{
             print(error.localizedDescription)
         }
         
     }
     var body: some View {
-        Form{
-            Text("Inicio de sesión")
-                .font(.title)
-                .foregroundStyle(.blue)
-                .frame(maxWidth: .infinity)
-            Section{
-            TextField("Correo electrónico", text: $email)
-                    .keyboardType(.emailAddress)
-            SecureField("Contraseña", text: $password)
-            
-                Button(action: {
-                    Task{
-                        await login()
-                    }
+        NavigationStack {
+            Form{
+                Text("Inicio de sesión")
+                    .font(.title)
+                    .foregroundStyle(.blue)
+                    .frame(maxWidth: .infinity)
+                Section{
+                    TextField("Correo electrónico", text: $email)
+                        .keyboardType(.emailAddress)
+                    SecureField("Contraseña", text: $password)
                     
-                }){
-                    Text("Iniciar sesión")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .foregroundColor(.white)
-                        .background(Color.blue)
-                        .cornerRadius(10)
+                    Button(action: {
+                        Task{
+                            await login()
+                        }
+                        
+                    }){
+                        Text("Iniciar sesión")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .foregroundColor(.white)
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                    }
+                    NavigationLink("Registrarse"){
+                        UserRegistration()
+                    }
                 }
+                
             }
-            
-        }
+        }.navigationTitle("Login")
     }
 }
 
 #Preview {
-    LoginScreen(onLoginSuccess: {})
+    LoginScreen()
 }
