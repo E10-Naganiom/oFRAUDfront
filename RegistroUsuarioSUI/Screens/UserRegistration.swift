@@ -24,21 +24,50 @@ struct UserRegistration: View {
     
     
     var body: some View {
+        VStack (spacing:12){
+            ZStack {
+                LinearGradient(
+                    colors: [.gray, .green],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .frame(width:80, height: 80)
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .shadow(radius: 8)
+                Image(systemName:"shield.fill").font(.system(size: 32)).foregroundColor(.blue)
+            }
+            Text("oFraud")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .padding()
+            Text("Unete a nuestra comunidad de proteccion digital")
+                .font(.caption)
+                .foregroundColor(.primary)
+        }.padding(.bottom,20)
         VStack {
             Text("Registro")
-                .font(.title)
+                .font(.title.bold())
+            Text("Crea una cuenta").font(.title2)
         }
         Form {
             TextField("Nombre", text: $registrationForm.nombre)
             TextField("Correo", text: $registrationForm.correo)
             SecureField("Contrasena", text: $registrationForm.contrasena)
-            Button("Registrar"){
+            Button(action: {
                 errorMessages = registrationForm.validate()
                 if errorMessages.isEmpty{
                     Task{
                         await register()
                     }
                 }
+                
+            }){
+                Text("Registrar")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(Color.blue)
+                    .cornerRadius(10)
             }
         }
         if !errorMessages.isEmpty{
