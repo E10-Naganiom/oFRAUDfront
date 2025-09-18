@@ -13,6 +13,7 @@ struct LoginScreen: View {
     @Environment(\.authController) var authenticationController
     @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     @State var errorMessages: [String] = []
+    @State private var navigateToRegister = false
     
     private func login() async {
         await MainActor.run { errorMessages.removeAll()}
@@ -29,7 +30,7 @@ struct LoginScreen: View {
             }
         }catch{
             await MainActor.run {
-                errorMessages.append(error.localizedDescription)
+                errorMessages.append("Credenciales invalidas")
             }
             print(error.localizedDescription)
         }
@@ -40,7 +41,7 @@ struct LoginScreen: View {
             VStack (spacing:12){
                 ZStack {
                     LinearGradient(
-                        colors: [.gray, .green],
+                        colors: [.green, .white],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -52,23 +53,36 @@ struct LoginScreen: View {
                 Text("oFraud")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .padding()
                 Text("Proteccion digital al alcance de todos")
-                    .font(.caption)
+                    .font(.headline)
                     .foregroundColor(.primary)
+                    .padding(.bottom)
             }.padding(.bottom,20)
             VStack(spacing:20){
-                Text("Inicio de Sesion").font(.title2.bold()).foregroundColor(.gray)
+                Text("Inicio de Sesion").font(.title2.bold()).foregroundColor(.green)
+                Text("Ingresa a tu cuenta para continuar")
             }
             Form{
-                Text("Inicio de sesión")
-                    .font(.title)
-                    .foregroundStyle(.blue)
-                    .frame(maxWidth: .infinity)
+//                Text("Inicio de sesión")
+//                    .font(.title)
+//                    .foregroundStyle(.blue)
+//                    .frame(maxWidth: .infinity)
                 Section{
-                    TextField("Correo electrónico", text: $email)
-                        .keyboardType(.emailAddress)
-                    SecureField("Contraseña", text: $password)
+                    VStack(alignment: .leading, spacing:4){
+                        Text("Correo electronico").font(.caption).foregroundColor(.gray)
+                        HStack{
+                            Image(systemName:"envelope.fill")
+                            TextField("Correo electrónico", text: $email)
+                                .keyboardType(.emailAddress).autocapitalization(.none)
+                        }
+                    }
+                    VStack(alignment: .leading, spacing:4){
+                        Text("Contraseña").font(.caption).foregroundColor(.gray)
+                        HStack{
+                            Image(systemName:"lock.fill")
+                            SecureField("Contraseña", text: $password)
+                        }
+                    }
                     
                     Button(action: {
                         
@@ -81,20 +95,33 @@ struct LoginScreen: View {
                             .frame(maxWidth: .infinity)
                             .padding()
                             .foregroundColor(.white)
-                            .background(Color.blue)
+                            .background(Color.green)
                             .cornerRadius(10)
                     }
                 }
-                
-                Text("No tienes una cuenta?")
-                NavigationLink("Registrarse"){
-                    UserRegistration()
+                VStack(spacing:8){
+                    HStack(spacing: 4){
+                        Text("No tienes una cuenta?")
+                        Text("Registrarse").foregroundColor(.green).bold().onTapGesture {
+                            navigateToRegister = true
+                        }
+                    }.frame(maxWidth: .infinity, alignment: .center)
+                    
+                    Text ("Al continuar, aceptas nuestros términos de servicio y política de privacidad.").font(.footnote).foregroundColor(.gray).multilineTextAlignment(.center).padding(.top, 8)
                 }
+                
+
+//                NavigationLink("Registrarse"){
+//                    UserRegistration()
+//                }
             }
             if(!errorMessages.isEmpty){
                 ValidationSummary(errors: errorMessages)
             }
         }.navigationTitle("Login")
+            .navigationDestination(isPresented: $navigateToRegister){
+                UserRegistration()
+            }
     }
 }
 

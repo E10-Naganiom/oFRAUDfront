@@ -16,10 +16,30 @@ struct ProfileController {
         self.profileClient = profileClient
     }
     
-    func getProfile() async throws -> Profile {
-        let accessToken = TokenStorage.get(identifier: "accessToken")
+    func getProfile() async throws -> ProfileObs {
+            let accessToken = TokenStorage.get(identifier: "accessToken")!
+            let response = try await profileClient.getUserProfile(token: accessToken)
+
+
+            let profileObs = ProfileObs()
+            profileObs.id = response.profile.id
+            profileObs.name = response.profile.name
+            profileObs.email = response.profile.email
+            profileObs.password = response.profile.passwordHash
+            return profileObs
+        }
         
-        let response = try await profileClient.getUserProfile(token: accessToken!)
-        return response.profile
-    }
+        func updateProfile(_ profile: ProfileObs) async throws {
+            let accessToken = TokenStorage.get(identifier: "accessToken")!
+            try await profileClient.updateUserProfile(
+                id: profile.id,
+                name: profile.name,
+                email: profile.email,
+                password: profile.password,
+                token: accessToken
+            )
+        }
+
+
+
 }

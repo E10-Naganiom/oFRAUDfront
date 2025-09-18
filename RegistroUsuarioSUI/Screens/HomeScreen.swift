@@ -22,6 +22,7 @@ struct HomeScreen: View {
                 Tab{
                     NavigationStack{
                         Text("Pagina historial")
+                        HistorialView()
                     }
                 }label:{
                     Label("Historial", systemImage: "clock.arrow.circlepath")
@@ -37,11 +38,6 @@ struct HomeScreen: View {
                     NavigationStack{
                         Text("Pagina perfil del usuario")
                         ProfileView()
-                        Button("Salir de  la sesion"){
-                            TokenStorage.delete(identifier: "accessToken")
-                            TokenStorage.delete(identifier: "refreshToken")
-                            isLoggedIn = false
-                        }
                     }
                 }label: {
                     Label("Perfil", systemImage: "person.crop.circle")

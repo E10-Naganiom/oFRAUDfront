@@ -12,68 +12,121 @@ struct UserRegistration: View {
     @State var registrationForm = UserRegistrationForm()
     @State var errorMessages: [String] = []
     
+    @State private var showSuccessMessage: Bool = false
+    @State private var navigateToLogin: Bool = false
+    
     func register() async {
         do{
             let response = try await authenticationController.registerUser(name: registrationForm.nombre, email: registrationForm.correo, password: registrationForm.contrasena)
             print("Usuario registrado con éxito: \(response)")
+            
+            DispatchQueue.main.async {
+                showSuccessMessage = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+                    navigateToLogin = true
+                }
+            }
+            
         }
         catch{
             print("Error al registrar el usuario: \(error)")
+            errorMessages.append("Error al registrar el usuario: Datos invalidos o el usuario ya existe.")
         }
     }
     
     
     var body: some View {
-        VStack (spacing:12){
-            ZStack {
-                LinearGradient(
-                    colors: [.gray, .green],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .frame(width:80, height: 80)
-                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                .shadow(radius: 8)
-                Image(systemName:"shield.fill").font(.system(size: 32)).foregroundColor(.blue)
+        NavigationStack{
+            VStack (spacing:12){
+                ZStack {
+                    LinearGradient(
+                        colors: [.green, .white],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .frame(width:80, height: 80)
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .shadow(radius: 8)
+                    Image(systemName:"shield.fill").font(.system(size: 32)).foregroundColor(.blue)
+                }
+                Text("oFraud")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                Text("Unete a nuestra comunidad de protección digital")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                    .padding(.bottom)
+            }.padding(.bottom,20)
+            VStack(spacing:20){
+                Text("Registro").font(.title2.bold()).foregroundColor(.green)
+                Text("Completa tus datos para crear una cuenta")
             }
-            Text("oFraud")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding()
-            Text("Unete a nuestra comunidad de proteccion digital")
-                .font(.caption)
-                .foregroundColor(.primary)
-        }.padding(.bottom,20)
-        VStack {
-            Text("Registro")
-                .font(.title.bold())
-            Text("Crea una cuenta").font(.title2)
-        }
-        Form {
-            TextField("Nombre", text: $registrationForm.nombre)
-            TextField("Correo", text: $registrationForm.correo)
-            SecureField("Contrasena", text: $registrationForm.contrasena)
-            Button(action: {
-                errorMessages = registrationForm.validate()
-                if errorMessages.isEmpty{
-                    Task{
-                        await register()
+            Form {
+                Section{
+                    VStack(alignment: .leading, spacing:4){
+                        Text("Nombre").font(.caption).foregroundColor(.gray)
+                        HStack{
+                            Image(systemName:"person.crop.circle.fill")
+                            TextField("Nombre completo", text: $registrationForm.nombre)
+                        }
+                    }
+                    VStack(alignment: .leading, spacing:4){
+                        Text("Correo electrónico").font(.caption).foregroundColor(.gray)
+                        HStack{
+                            Image(systemName:"envelope.fill")
+                            TextField("E-mail", text: $registrationForm.correo)
+                        }
+                    }
+                    VStack(alignment: .leading, spacing:4){
+                        Text("Contraseña").font(.caption).foregroundColor(.gray)
+                        HStack{
+                            Image(systemName:"lock.fill")
+                            SecureField("Contrasena", text: $registrationForm.contrasena)
+                        }
+                    }
+                    Button(action: {
+                        errorMessages = registrationForm.validate()
+                        if errorMessages.isEmpty{
+                            Task{
+                                await register()
+                            }
+                        }
+                        
+                    }){
+                        Text("Registrar")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .foregroundColor(.white)
+                            .background(Color.green)
+                            .cornerRadius(10)
                     }
                 }
-                
-            }){
-                Text("Registrar")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .foregroundColor(.white)
-                    .background(Color.blue)
-                    .cornerRadius(10)
+                VStack(spacing:8){
+                    HStack(spacing: 4){
+                        Text("Ya tienes una cuenta?")
+                        Text("Inicia sesión").foregroundColor(.green).bold().onTapGesture {
+                            navigateToLogin = true
+                        }
+                    }.frame(maxWidth: .infinity, alignment: .center)
+                    
+                    Text ("Al continuar, aceptas nuestros términos de servicio y política de privacidad.").font(.footnote).foregroundColor(.gray).multilineTextAlignment(.center).padding(.top, 8)
+                }
             }
+            if !errorMessages.isEmpty{
+                ValidationSummary(errors: errorMessages)
+            }
+            
         }
-        if !errorMessages.isEmpty{
-            ValidationSummary(errors: errorMessages)
+        .navigationDestination(isPresented: $navigateToLogin){
+            LoginScreen()
         }
-
+        .alert("Registro exitoso", isPresented: $showSuccessMessage){
+            Button("Aceptar", role: .cancel){
+                navigateToLogin = true
+            }
+        } message: {
+            Text("Se ha registrado con exito. Favor de iniciar sesion.")
+        }
     }
 }
 
