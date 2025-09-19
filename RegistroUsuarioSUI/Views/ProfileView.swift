@@ -4,9 +4,7 @@
 //
 //  Created by Usuario on 15/09/25.
 //
-
 import SwiftUI
-
 struct ProfileView: View {
     var profileController: ProfileController
     @State var profile = ProfileObs()
@@ -44,6 +42,11 @@ struct ProfileView: View {
     }
     var body: some View {
         @Bindable var profile = profile
+        ZStack{
+            Circle().fill(Color.green.opacity(0.3)).frame(width: 120, height: 120)
+            Text(String(profile.name.prefix(1)).uppercased()).font(.system(size: 64, weight:.bold)).foregroundColor(.green)
+        }.padding(.top, 20)
+        Text("Hola, \(profile.name)").font(.headline)
         Group{
             if isLoading {
                 ProgressView("Cargando perfil ...")
@@ -59,6 +62,7 @@ struct ProfileView: View {
                             Task { await updateProfile()}
                         }.buttonStyle(.borderedProminent)
                     }
+                    
                     Section{
                         Button("Cerrar sesion", role: .destructive){
                             TokenStorage.delete(identifier: "accessToken")
@@ -75,10 +79,9 @@ struct ProfileView: View {
         .alert("Perfil actualizado", isPresented: $showUpdateSuccess){
             Button("OK", role: .cancel) {}
         }
-
     }
 }
-
 #Preview {
     ProfileView()
 }
+

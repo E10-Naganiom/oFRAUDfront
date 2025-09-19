@@ -21,7 +21,6 @@ struct HomeScreen: View {
                 }
                 Tab{
                     NavigationStack{
-                        Text("Pagina historial")
                         HistorialView()
                     }
                 }label:{

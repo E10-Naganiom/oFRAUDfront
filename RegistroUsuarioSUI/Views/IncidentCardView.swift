@@ -9,49 +9,55 @@ import SwiftUI
 
 
 struct IncidentCardView: View {
-    let incident: Incident
 
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(incident.id.description)
+                Text("Titulo/ID del incidente")
                     .font(.headline)
                 Spacer()
-                Text(incident.status)
+                
+                NavigationLink(destination: IncidentDetailView()){
+                    Image(systemName: "eye")
+                        .foregroundColor(.green).padding(6).background(Color(.systemGray5)).clipShape(Circle())
+                }.buttonStyle(PlainButtonStyle())
+                Text("Estatus del incidente")
                     .font(.caption)
                     .padding(6)
-                    .background(incident.status == "Aprobado" ? Color.green.opacity(0.2) : Color.orange.opacity(0.2))
-                    .foregroundColor(incident.status == "Aprobado" ? .green : .orange)
+                    .background(Color.green.opacity(0.2))
+                    .foregroundColor(.orange)
                     .cornerRadius(8)
             }
 
 
-            Text(incident.title)
+            Text("Categoria")
                 .font(.subheadline)
                 .foregroundColor(.primary)
 
 
             HStack {
-                Label(incident.createdAt.formatted(date: .abbreviated, time: .omitted), systemImage: "Calendar")
+                Label("Fecha del incidente", systemImage: "calendar")
                 Spacer()
-                Text("\(incident.attachments) archivo\(incident.attachments > 1 ? "s" : "")")
+                Image(systemName: "paperclip")
+                Text(" X Archivos adjuntos")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
 
 
-            Text("Última actualización: \(incident.lastUpdated.formatted(date: .abbreviated, time: .omitted))")
+            Text("Última actualización:")
                 .font(.caption2)
                 .foregroundColor(.secondary)
+
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color(.green).opacity(0.1))
         .cornerRadius(12)
         .shadow(radius: 2)
     }
 }
 
-//#Preview {
-//    IncidentCardView()
-//}
+#Preview {
+    IncidentCardView()
+}
