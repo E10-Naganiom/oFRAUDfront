@@ -14,7 +14,7 @@ struct HomeScreen: View {
             TabView{
                 Tab{
                     NavigationStack{
-                        Text("Pagina de estadisticas y de incidencias")
+                        DashboardView()
                     }
                 }label:{
                     Label("Inicio", systemImage:"house.and.flag")
@@ -35,7 +35,6 @@ struct HomeScreen: View {
                 }
                 Tab{
                     NavigationStack{
-                        Text("Pagina perfil del usuario")
                         ProfileView()
                     }
                 }label: {

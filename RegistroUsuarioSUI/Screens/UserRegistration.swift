@@ -75,6 +75,8 @@ struct UserRegistration: View {
                         HStack{
                             Image(systemName:"envelope.fill")
                             TextField("E-mail", text: $registrationForm.correo)
+                                .autocorrectionDisabled()
+                                .textInputAutocapitalization(.never)
                         }
                     }
                     VStack(alignment: .leading, spacing:4){
