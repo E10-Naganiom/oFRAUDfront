@@ -28,7 +28,7 @@ struct HomeScreen: View {
                 }
                 Tab{
                     NavigationStack{
-                        Text("Pagina categorias")
+                        OrganizationView()
                     }
                 }label:{
                     Label("Guias", systemImage: "book")
