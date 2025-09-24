@@ -1,5 +1,5 @@
 //
-//  AboutUsView.swift
+//  OrganizationView.swift
 //  RegistroUsuarioSUI
 //
 //  Created by Usuario on 23/09/25.
