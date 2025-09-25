@@ -1,31 +1,31 @@
 //
-//  HistorialView.swift
+//  ResultsView.swift
 //  RegistroUsuarioSUI
 //
-//  Created by Usuario on 17/09/25.
+//  Created by Usuario on 25/09/25.
 //
 
 import SwiftUI
 
 
-struct HistorialView: View {
+struct ResultsView: View {
     @State private var incidents: [Incident] = []
     @State private var isLoading = true
     @State private var searchText: String = ""
     @State private var selectedStatus: String = "Todos los estatus"
     
-    let statusOptions = ["Todos los estatus", "Aprobados", "Pendientes"]
+    let statusOptions = ["Todos los estatus", "Aprobados", "Pendientes", "Rechazados"]
     
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 15) {
                 
                 HStack {
-                    Image(systemName:"document.fill")
-                    Text("Historial de reportes").font(.title2) .bold()
+                    Image(systemName:"magnifyingglass")
+                    Text("Resultados de reportes").font(.title2) .bold()
                     Spacer()
                 }.padding()
-                Text("Consulta el estado de tus reportes de incidentes").font(.subheadline).foregroundColor(.gray).padding(.horizontal)
+                Text("Consulta diversos reportes de incidentes").font(.subheadline).foregroundColor(.gray).padding(.horizontal)
                 TextField("Buscar reportes por ID, categoria o titulo", text: $searchText)
                     .padding(10).background(Color(.systemGray6)).cornerRadius(8).padding(.top, 5).padding(.horizontal)
                 HStack {
@@ -34,7 +34,7 @@ struct HistorialView: View {
                             status in Text(status)
                         }
                     }.pickerStyle(MenuPickerStyle()).padding(.horizontal)
-                    NavigationLink(destination: HistorialView()){
+                    NavigationLink(destination: ResultsView()){
                         Text("Buscar")
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
@@ -44,10 +44,11 @@ struct HistorialView: View {
                         
                     }
                 }
-                
             }
             ScrollView {
                 LazyVStack(spacing: 12) {
+                    Text("Incidentes encontrados:")
+                        .font(.headline).padding(.horizontal).padding(.top).bold(true)
                     if isLoading {
                         ProgressView("Cargando reportes...")
                             .padding()
@@ -67,39 +68,22 @@ struct HistorialView: View {
                 }
                 VStack(alignment: .leading, spacing: 5){
                     Text("Resumen").font(.headline)
-                    Text("Total de reportes: 123")
-                    Text("Aprobados: 2")
+                    Text("Reportes que coinciden con tu busqueda: 3").font(.subheadline)
                 }
                 .padding().frame(maxWidth: .infinity, alignment: .leading).background(Color(.green)).cornerRadius(10).padding()
             }
-            .navigationTitle("Mi Historial")
+            .navigationTitle("Busqueda de Reportes")
             .task {
                 //await fetchIncidents()
             }
         }
     }
 
-
-//    private func fetchIncidents() async {
-//        do {
-//            let token = TokenStorage.get(identifier: "accessToken")
-//            let fetched = try await IncidentClient().getUserIncidents(token: token!)
-//            await MainActor.run {
-//                incidents = fetched
-//                isLoading = false
-//            }
-//        } catch {
-//            print("Error al obtener incidentes:", error)
-//            await MainActor.run {
-//                isLoading = false
-//            }
-//        }
-//    }
 }
 
 
 
 
 #Preview {
-    HistorialView()
+    ResultsView()
 }

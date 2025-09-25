@@ -49,9 +49,12 @@ struct DashboardView: View {
                         
                     
                     VStack {
-                        TextField("Buscar incidentes por ID, tipo de incidente", text: $searchText)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .padding(.bottom, 4)
+                        HStack {
+                            TextField("Buscar incidentes por ID, tipo de incidente", text: $searchText)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .padding(.bottom,8)
+                            
+                        }
                         HStack {
                                 Image(systemName: "magnifyingglass")
                                 Text("Filtrar por categoria")
@@ -61,6 +64,15 @@ struct DashboardView: View {
                                     tipo in Text(tipo)
                                 }
                             }.pickerStyle(MenuPickerStyle()).padding(.horizontal)
+                            NavigationLink(destination: ResultsView()){
+                                Text("Buscar")
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(Color.green)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                                
+                            }
                         }
                     }
                     .padding(.vertical)
@@ -207,6 +219,23 @@ struct DashboardView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                     }
                     
+                    HStack {
+                        Text("Actividad reciente").font(.title2.bold()).padding(.top)
+                        NavigationLink(destination: ResultsView()){
+                            Text("Ver todo")
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 5)
+                                .background(Color.green)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                            
+                        }.padding(.horizontal)
+                    }
+                    VStack{
+                        IncidentCardView()
+                        IncidentCardView()
+                        IncidentCardView()
+                    }
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Image(systemName: "lightbulb.min.fill")

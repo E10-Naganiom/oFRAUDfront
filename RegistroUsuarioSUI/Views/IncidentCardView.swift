@@ -49,6 +49,9 @@ struct IncidentCardView: View {
             Text("Última actualización:")
                 .font(.caption2)
                 .foregroundColor(.secondary)
+            Text("Reportado por:")
+                .font(.caption2)
+                .foregroundColor(.secondary)
 
         }
         .padding()
