@@ -8,19 +8,39 @@
 import SwiftUI
 import Charts // para las gráficas
 
-
 struct DashboardView: View {
     @State private var searchText = ""
     @State private var selectedFilter = "Todas"
     
     let filtros = ["Todas", "Phishing", "Malware", "Ransomware", "Fraude"]
     
+    // Datos hardcodeados para fuentes de tráfico
+    let trafficSources = [
+        ("Phishing", 1250, 42.5, Color.yellow),
+        ("Malware", 850, 28.9, Color.blue),
+        ("Ransomware", 520, 17.7, Color.red),
+        ("Llamadas", 320, 10.9, Color.green)
+    ]
+    
+    // Datos hardcodeados para visitas
+    let visitData = [
+        ("Mes anterior", 3250),
+        ("Mes Actual", 4180)
+    ]
+    
+    var totalSessions: Int {
+        trafficSources.reduce(0) { $0 + $1.1 }
+    }
+    
+    var currentVisits: Int { 4180 }
+    var previousVisits: Int { 3250 }
+    
     var body: some View {
         ZStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     
-                    Text("👋 Bienvenid@ a oFraud")
+                    Text("Bienvenid@ a oFraud")
                         .font(.title.bold())
                         .padding(.top)
                     
@@ -47,73 +67,143 @@ struct DashboardView: View {
                     
                     // Estadísticas
                     VStack(alignment: .leading, spacing: 16) {
-                        HStack {
-                            Image(systemName: "cellularbars")
-                            Text("Estadísticas")
-                                .font(.title2.bold())
-                        }
                         
-                        // Casos activos (line chart)
-//                        Chart {
-//                            ForEach(1..<7) { mes in
-//                                LineMark(
-//                                    x: .value("Mes", mes),
-//                                    y: .value("Casos", Int.random(in: 20...100))
-//                                )
-//                            }
-//                        }
-//                        .frame(height: 200)
-//                        .padding()
-//                        .background(.gray.opacity(0.1))
-//                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        
-                        // Casos resueltos (bar chart)
-//                        Chart {
-//                            ForEach(1..<5) { categoria in
-//                                BarMark(
-//                                    x: .value("Categoría", "Cat\(categoria)"),
-//                                    y: .value("Resueltos", Int.random(in: 10...50))
-//                                )
-//                            }
-//                        }
-//                        .frame(height: 200)
-//                        .padding()
-//                        .background(.gray.opacity(0.1))
-//                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        
-                        // Usuarios protegidos (pie chart simulado)
-                        HStack {
-                            VStack {
-                                HStack {
-                                    Image(systemName: "person.2.circle.fill")
-                                    Text("Usuarios protegidos")
-                                        .font(.headline)
-                                }
-                                ProgressView(value: 0.75)
-                                    .progressViewStyle(.linear)
-                                Text("75%")
+                        // GRÁFICO PIE CHART - Fuentes de Tráfico
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Image(systemName: "network")
+                                    .foregroundColor(.orange)
+                                Text("Incidentes más comunes")
+                                    .font(.title2.bold())
                             }
-                            .frame(maxWidth: .infinity)
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("\(totalSessions.formatted())")
+                                    .font(.largeTitle.bold())
+                                    .foregroundColor(.primary)
+                                
+                                Text("Total de sesiones • Por fuente")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            HStack(spacing: 20) {
+                                // Pie Chart
+                                Chart(trafficSources, id: \.0) { source in
+                                    SectorMark(
+                                        angle: .value("Count", source.1),
+                                        innerRadius: .ratio(0.5),
+                                        angularInset: 2
+                                    )
+                                    .foregroundStyle(source.3)
+                                }
+                                .frame(width: 120, height: 120)
+                                
+                                // Legend
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ForEach(Array(trafficSources.enumerated()), id: \.offset) { index, source in
+                                        HStack {
+                                            Circle()
+                                                .fill(source.3)
+                                                .frame(width: 8, height: 8)
+                                            
+                                            Text(source.0)
+                                                .font(.caption)
+                                                .foregroundColor(.primary)
+                                            
+                                            Spacer()
+                                            
+                                            VStack(alignment: .trailing, spacing: 0) {
+                                                Text("\(source.1.formatted())")
+                                                    .font(.caption.bold())
+                                                    .foregroundColor(.primary)
+                                                
+                                                Text("\(source.2, specifier: "%.1f")%")
+                                                    .font(.caption2)
+                                                    .foregroundColor(.secondary)
+                                                    .padding(.horizontal, 4)
+                                                    .padding(.vertical, 1)
+                                                    .background(.gray.opacity(0.1))
+                                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                            }
+                                        }
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
                         }
                         .padding()
-                        .background(.gray.opacity(0.1))
+                        .background(.gray.opacity(0.05))
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         
-                        // Estado de seguridad (progress circular)
-                        VStack {
+                        // GRÁFICO DE BARRAS - Visitas del Sitio
+                        VStack(alignment: .leading, spacing: 16) {
                             HStack {
-                                Image(systemName: "light.beacon.max.fill")
-                                Text("Estado general de seguridad")
-                                    .font(.headline)
+                                Image(systemName: "eye")
+                                    .foregroundColor(.orange)
+                                Text("Número de Reportes")
+                                    .font(.title2.bold())
                             }
-                            ProgressView(value: 0.6)
-                                .progressViewStyle(.linear)
-                                .scaleEffect(1.5)
-                            Text("60%")
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("\(currentVisits.formatted())")
+                                    .font(.largeTitle.bold())
+                                    .foregroundColor(.primary)
+                                
+                                Text("Visitas totales • Tendencia")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            // Bar Chart
+                            Chart(visitData, id: \.0) { data in
+                                BarMark(
+                                    x: .value("Period", data.0),
+                                    y: .value("Visits", data.1)
+                                )
+                                .foregroundStyle(data.0 == "Actual" ? Color.green : Color.blue)
+                                .cornerRadius(4)
+                            }
+                            .frame(height: 150)
+                            .chartXAxis {
+                                AxisMarks { _ in
+                                    // Hide X axis labels
+                                }
+                            }
+                            .chartYAxis(.hidden)
+                            
+                            // Stats Grid
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Período Anterior")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                    
+                                    Text("\(previousVisits.formatted())")
+                                        .font(.headline.bold())
+                                        .foregroundColor(.primary)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                
+                                Rectangle()
+                                    .fill(.gray.opacity(0.3))
+                                    .frame(width: 1, height: 30)
+                                
+                                VStack(alignment: .trailing, spacing: 4) {
+                                    Text("Período Actual")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                    
+                                    Text("\(currentVisits.formatted())")
+                                        .font(.headline.bold())
+                                        .foregroundColor(.primary)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                            }
+                            .padding(.top, 8)
                         }
-                        .frame(maxWidth: .infinity)
                         .padding()
-                        .background(.gray.opacity(0.1))
+                        .background(.gray.opacity(0.05))
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                     }
                     
@@ -129,6 +219,38 @@ struct DashboardView: View {
                     .padding()
                     .background(.green.opacity(0.2))
                     .clipShape(RoundedRectangle(cornerRadius: 12))
+                    
+                    // Organization section
+                    NavigationLink(destination: OrganizationView()) {
+                        HStack(spacing: 15) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.green.opacity(0.2))
+                                    .frame(width: 60, height: 60)
+                                Image(systemName: "building.2.fill")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(.green)
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Conocer Nuestra Organización")
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                Text("Información sobre Red por la Ciberseguridad")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            Spacer()
+                            
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(16)
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
                 .padding()
             }
@@ -154,13 +276,8 @@ struct DashboardView: View {
     }
 }
 
-
 #Preview {
     NavigationStack {
         DashboardView()
     }
 }
-
-
-
-
