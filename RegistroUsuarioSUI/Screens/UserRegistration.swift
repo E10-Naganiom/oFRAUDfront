@@ -11,6 +11,7 @@ struct UserRegistration: View {
     @Environment(\.authController) var authenticationController
     @State var registrationForm = UserRegistrationForm()
     @State var errorMessages: [String] = []
+    @State private var acceptedTerms: Bool = false
     
     @State private var showSuccessMessage: Bool = false
     @State private var navigateToLogin: Bool = false
@@ -86,8 +87,37 @@ struct UserRegistration: View {
                             SecureField("Contrasena", text: $registrationForm.contrasena)
                         }
                     }
+                }
+                
+                // Terms and conditions section
+                Section {
+                    HStack(alignment: .top, spacing: 8) {
+                        Button(action: {
+                            acceptedTerms.toggle()
+                        }) {
+                            Image(systemName: acceptedTerms ? "checkmark.square.fill" : "square")
+                                .foregroundColor(acceptedTerms ? .green : .gray)
+                                .font(.title2)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        
+                        (Text("Acepto los ") +
+                         Text("términos de servicio y políticas de privacidad")
+                            .foregroundColor(.green)
+                            .underline())
+                        .font(.footnote)
+                        .onTapGesture {
+                            // Only trigger on the green text area
+                            // TODO: Navigate to terms of service
+                            print("Navigate to terms of service")
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+                
+                Section {
                     Button(action: {
-                        errorMessages = registrationForm.validate()
+                        errorMessages = registrationForm.validate(acceptedTerms: acceptedTerms)
                         if errorMessages.isEmpty{
                             Task{
                                 await register()
@@ -99,10 +129,12 @@ struct UserRegistration: View {
                             .frame(maxWidth: .infinity)
                             .padding()
                             .foregroundColor(.white)
-                            .background(Color.green)
+                            .background(acceptedTerms ? Color.green : Color.gray)
                             .cornerRadius(10)
                     }
+                    .disabled(!acceptedTerms)
                 }
+                
                 VStack(spacing:8){
                     HStack(spacing: 4){
                         Text("Ya tienes una cuenta?")
@@ -110,8 +142,6 @@ struct UserRegistration: View {
                             navigateToLogin = true
                         }
                     }.frame(maxWidth: .infinity, alignment: .center)
-                    
-                    Text ("Al continuar, aceptas nuestros términos de servicio y política de privacidad.").font(.footnote).foregroundColor(.gray).multilineTextAlignment(.center).padding(.top, 8)
                 }
             }
             if !errorMessages.isEmpty{
@@ -138,7 +168,7 @@ extension UserRegistration{
         var correo: String = ""
         var contrasena: String = ""
         
-        func validate() -> [String]{
+        func validate(acceptedTerms: Bool) -> [String]{
             var errors: [String] = []
             
             if nombre.esVacío{
@@ -156,6 +186,9 @@ extension UserRegistration{
             if !contrasena.esPasswordValido{
                 errors.append("La contrasena no cumple con el requerimiento de tener al menos 8 caracteres")
             }
+            if !acceptedTerms{
+                errors.append("Debes aceptar los términos de servicio y política de privacidad")
+            }
             
             return errors
         }
@@ -165,4 +198,3 @@ extension UserRegistration{
 #Preview {
     UserRegistration()
 }
-

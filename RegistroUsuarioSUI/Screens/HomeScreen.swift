@@ -10,7 +10,6 @@ import SwiftUI
 struct HomeScreen: View {
     @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     var body: some View {
-        NavigationStack {
             TabView{
                 Tab{
                     NavigationStack{
@@ -42,7 +41,6 @@ struct HomeScreen: View {
                 }
             }
         }
-    }
 }
 
 #Preview {

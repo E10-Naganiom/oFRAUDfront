@@ -13,6 +13,7 @@ struct ReportView: View {
     @State private var titulo = ""
     @State private var tipoIncidente = "Phishing"
     @State private var atacante = ""
+    @State private var fechaIncidente = Date()
     
     @State private var contactos: [MetodoContacto] = []
     @State private var descripcion = ""
@@ -41,6 +42,13 @@ struct ReportView: View {
                 }
                 
                 TextField("Empresa o individuo atacante", text: $atacante)
+                
+                DatePicker(
+                    "Fecha del incidente",
+                    selection: $fechaIncidente,
+                    in: ...Date(),
+                    displayedComponents: [.date]
+                )
             }
             
             // Métodos de contacto
@@ -166,8 +174,3 @@ struct MetodoContacto: Identifiable {
         ReportView()
     }
 }
-
-
-
-
-
