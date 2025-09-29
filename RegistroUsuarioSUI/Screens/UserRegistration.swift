@@ -18,7 +18,7 @@ struct UserRegistration: View {
     
     func register() async {
         do{
-            let response = try await authenticationController.registerUser(name: registrationForm.nombre, email: registrationForm.correo, password: registrationForm.contrasena)
+            let response = try await authenticationController.registerUser(name: registrationForm.nombre, lastName: registrationForm.apellido, email: registrationForm.correo, password: registrationForm.contrasena)
             print("Usuario registrado con éxito: \(response)")
             
             DispatchQueue.main.async {
@@ -68,7 +68,14 @@ struct UserRegistration: View {
                         Text("Nombre").font(.caption).foregroundColor(.gray)
                         HStack{
                             Image(systemName:"person.crop.circle.fill")
-                            TextField("Nombre completo", text: $registrationForm.nombre)
+                            TextField("Nombre", text: $registrationForm.nombre)
+                        }
+                    }
+                    VStack(alignment: .leading, spacing:4){
+                        Text("Apellido").font(.caption).foregroundColor(.gray)
+                        HStack{
+                            Image(systemName:"person.crop.circle")
+                            TextField("Apellido", text: $registrationForm.apellido)
                         }
                     }
                     VStack(alignment: .leading, spacing:4){
@@ -165,6 +172,7 @@ struct UserRegistration: View {
 extension UserRegistration{
     struct UserRegistrationForm{
         var nombre: String = ""
+        var apellido: String = ""
         var correo: String = ""
         var contrasena: String = ""
         
@@ -173,6 +181,9 @@ extension UserRegistration{
             
             if nombre.esVacío{
                 errors.append("El nombre es requerido")
+            }
+            if apellido.esVacío{
+                errors.append("El apellido es requerido")
             }
             if correo.esVacío{
                 errors.append( "El correo es requerido")

@@ -13,11 +13,11 @@ struct UserProfileResponse: Decodable {
 
 struct Profile: Decodable {
     let id: Int
-    let email, name, passwordHash, salt: String
+    let email, nombre, apellido, contrasena, salt: String
     
     enum CodingKeys: String, CodingKey {
-        case id, email, name
-        case passwordHash = "password_hash"
+        case id, email, nombre, apellido
+        case contrasena
         case salt
     }
 }

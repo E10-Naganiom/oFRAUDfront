@@ -8,9 +8,9 @@
 import Foundation
 
 struct HTTPClient {
-    func UserRegistration(name: String, email:String, password:String) async throws -> RegistrationFormResponse {
-        let requestForm = RegistrationFormRequest(name: name, email: email, password: password)
-        let url = URL(string: "http://10.48.238.118:3000/users")!
+    func UserRegistration(name: String, lastName: String, email:String, password:String) async throws -> RegistrationFormResponse {
+        let requestForm = RegistrationFormRequest(name: name, apellido: lastName, email: email, password: password)
+        let url = URL(string: "http://10.48.236.210:3000/users")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "POST"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -23,7 +23,7 @@ struct HTTPClient {
     
     func UserLogin(email: String, password: String) async throws -> LoginResponse {
         let loginRequest = LoginRequest(email: email, password: password)
-        guard let url = URL(string: "http://10.48.238.118:3000/auth/login") else {
+        guard let url = URL(string: "http://10.48.236.210:3000/auth/login") else {
             fatalError( "Invalid URL" + "http://10.48.237.37:3000/auth/login")
         }
         var urlRequest = URLRequest(url: url)

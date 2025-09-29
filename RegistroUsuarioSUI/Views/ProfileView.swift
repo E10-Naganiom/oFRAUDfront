@@ -20,8 +20,9 @@ struct ProfileView: View {
             let p = try await profileController.getProfile()
             await MainActor.run {
                 profile.email = p.email
-                profile.name = p.name
-                profile.password = p.password
+                profile.nombre = p.nombre
+                profile.apellido = p.apellido
+                profile.contrasena = p.contrasena
                 isLoading = false
             }
         } catch {
@@ -44,9 +45,9 @@ struct ProfileView: View {
         @Bindable var profile = profile
         ZStack{
             Circle().fill(Color.green.opacity(0.3)).frame(width: 120, height: 120)
-            Text(String(profile.name.prefix(1)).uppercased()).font(.system(size: 64, weight:.bold)).foregroundColor(.green)
+            Text(String(profile.nombre.prefix(1)).uppercased()).font(.system(size: 64, weight:.bold)).foregroundColor(.green)
         }.padding(.top, 20)
-        Text("Hola, \(profile.name)").font(.headline)
+        Text("Hola, \(profile.nombre)").font(.headline)
         Group{
             if isLoading {
                 ProgressView("Cargando perfil ...")
@@ -54,7 +55,8 @@ struct ProfileView: View {
             else {
                 Form{
                     Section(header: Text("Informacion de usuario")){
-                        TextField("Nombre", text: $profile.name)
+                        TextField("Nombre", text: $profile.nombre)
+                        TextField("Apellido", text: $profile.apellido)
                         TextField("Correo", text: $profile.email)
                     }
                     Section {
