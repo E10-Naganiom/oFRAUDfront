@@ -9,11 +9,13 @@ import SwiftUI
 
 
 struct ReportView: View {
-    // MARK: - Estados
+    
     @State private var titulo = ""
+    @State private var idCategoria = 0
     @State private var tipoIncidente = "Phishing"
     @State private var atacante = ""
-    @State private var fechaIncidente = Date()
+//    @State private var fechaIncidente = Date()
+    @State private var es_anonimo = false
     
     @State private var contactos: [MetodoContacto] = []
     @State private var descripcion = ""
@@ -34,21 +36,22 @@ struct ReportView: View {
             // Info básica
             Section(header: Text("Información Básica")) {
                 TextField("Título del incidente", text: $titulo)
+                TextField("Id categoria", value: $idCategoria, format: .number)
                 
-                Picker("Tipo de incidente", selection: $tipoIncidente) {
-                    ForEach(categorias, id: \.self) { cat in
-                        Text(cat)
-                    }
-                }
+//                Picker("Tipo de incidente", selection: $tipoIncidente) {
+//                    ForEach(categorias, id: \.self) { cat in
+//                        Text(cat)
+//                    }
+//                }
                 
                 TextField("Empresa o individuo atacante", text: $atacante)
                 
-                DatePicker(
-                    "Fecha del incidente",
-                    selection: $fechaIncidente,
-                    in: ...Date(),
-                    displayedComponents: [.date]
-                )
+//                DatePicker(
+//                    "Fecha del incidente",
+//                    selection: $fechaIncidente,
+//                    in: ...Date(),
+//                    displayedComponents: [.date]
+//                )
             }
             
             // Métodos de contacto
@@ -134,6 +137,13 @@ struct ReportView: View {
                 }
             }
             
+            Section{
+                HStack{
+                    Text("Desea que su reporte sea anonimo?")
+                    Spacer()
+                    Toggle("", isOn: $es_anonimo)
+                }
+            }
             // Nota importante
             Section {
                 Text("⚠️ Importante: No compartas información personal o sensible en este formulario. Solo incluye detalles relevantes del incidente.")
@@ -144,7 +154,27 @@ struct ReportView: View {
             // Botón enviar
             Section {
                 Button(action: {
-                    print("Reporte enviado 🚀")
+                    Task{
+                        do{
+                            let controller = IncidentsController(incidensClient: IncidentsClient())
+                            let response = try await controller.createIncident(
+                                titulo: titulo,
+                                id_categoria: idCategoria,
+                                nombre_atacante: atacante.isEmpty ? nil : atacante,
+                                telefono: contactos.first(where: { $0.tipo == "Teléfono"})?.valor,
+                                correo: contactos.first(where: { $0.tipo == "Correo"})?.valor,
+                                user: contactos.first(where: { $0.tipo == "Red Social"})?.valor,
+                                red_social: contactos.first(where: { $0.tipo == "Red Social"})?.redSocial,
+                                descripcion: descripcion,
+                                id_usuario: 1,
+                                supervisor: nil,
+                                es_anonimo: es_anonimo
+                            )
+                            print("Incidente creado con exito", response)
+                        } catch {
+                            print("Error al crear incidente", error)
+                        }
+                    }
                 }) {
                     Text("Enviar reporte")
                         .frame(maxWidth: .infinity)
