@@ -23,9 +23,10 @@ struct ProfileController {
 
             let profileObs = ProfileObs()
             profileObs.id = response.profile.id
-            profileObs.name = response.profile.name
+            profileObs.nombre = response.profile.nombre
+            profileObs.apellido = response.profile.apellido
             profileObs.email = response.profile.email
-            profileObs.password = response.profile.passwordHash
+            profileObs.contrasena = response.profile.contrasena
             return profileObs
         }
         
@@ -33,9 +34,10 @@ struct ProfileController {
             let accessToken = TokenStorage.get(identifier: "accessToken")!
             try await profileClient.updateUserProfile(
                 id: profile.id,
-                name: profile.name,
+                nombre: profile.nombre,
+                apellido: profile.apellido,
                 email: profile.email,
-                password: profile.password,
+                contrasena: profile.contrasena,
                 token: accessToken
             )
         }

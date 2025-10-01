@@ -19,8 +19,8 @@ class ProfileClient {
         return userProfileResponse
     }
     
-    func updateUserProfile(id: Int, name: String, email: String, password: String, token: String) async throws {
-            guard let url = URL(string: "http://10.48.238.74:3000/users/\(id)") else {
+    func updateUserProfile(id: Int, nombre: String, apellido: String, email: String, contrasena: String, token: String) async throws {
+            guard let url = URL(string: "http://10.48.237.254:3000/users/\(id)") else {
                 fatalError("Invalid URL")
             }
             var urlRequest = URLRequest(url: url)
@@ -29,9 +29,10 @@ class ProfileClient {
             urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
             
             let body: [String: Any?] = [
-                "name": name,
+                "nombre": nombre,
+                "apellido": apellido,
                 "email": email,
-                "password": password
+                "contrasena": contrasena
             ]
             urlRequest.httpBody = try JSONSerialization.data(withJSONObject: body)
             
