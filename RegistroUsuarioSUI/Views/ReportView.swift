@@ -20,6 +20,8 @@ struct ReportView: View {
     @State private var contactos: [MetodoContacto] = []
     @State private var descripcion = ""
     @State private var archivosAdjuntos: [String] = []
+    @State private var showSuccessAlert = false
+    @State private var navigateToDashboard = false
     
     let categorias = ["Phishing", "Malware", "Ransomware", "Fraude", "Otro"]
     let redesSociales = ["Twitter/X", "Facebook", "Instagram", "LinkedIn", "Otro"]
@@ -171,6 +173,7 @@ struct ReportView: View {
                                 es_anonimo: es_anonimo
                             )
                             print("Incidente creado con exito", response)
+                            showSuccessAlert = true
                         } catch {
                             print("Error al crear incidente", error)
                         }
@@ -183,6 +186,16 @@ struct ReportView: View {
                         .background(Color.green)
                         .cornerRadius(8)
                 }
+            }
+            .alert("Reporte enviado", isPresented: $showSuccessAlert){
+                Button("OK") {
+                    navigateToDashboard = true
+                }
+            } message: {
+                Text("Tu reporte se envio exitosamente, Seras redirigido a la pantalla principal")
+            }
+            .navigationDestination(isPresented: $navigateToDashboard){
+                DashboardView()
             }
         }
         .navigationTitle("Levantar Reporte")
