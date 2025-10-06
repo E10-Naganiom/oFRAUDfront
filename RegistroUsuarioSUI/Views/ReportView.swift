@@ -21,6 +21,8 @@ struct ReportView: View {
 //    @State private var fechaIncidente = Date()
     @State private var es_anonimo = false
     
+    @State private var currentUserId: Int? = nil
+    
     @State private var contactos: [MetodoContacto] = []
     @State private var descripcion = ""
     @State private var archivosAdjuntos: [String] = []
@@ -212,7 +214,7 @@ struct ReportView: View {
                                 user: contactos.first(where: { $0.tipo == "Red Social"})?.valor,
                                 red_social: contactos.first(where: { $0.tipo == "Red Social"})?.redSocial,
                                 descripcion: descripcion,
-                                id_usuario: 1,    //Debo meter el usuario real
+                                id_usuario: currentUserId ?? 0,
                                 supervisor: nil,
                                 es_anonimo: es_anonimo
                             )
@@ -247,8 +249,14 @@ struct ReportView: View {
             do {
                 categories = try await categoriesController.getAllCategories()
                 isLoadingCategories = false
+                
+                let profileController = ProfileController(profileClient: ProfileClient())
+                let profile = try await profileController.getProfile()
+                currentUserId = profile.id
+                print("Usuario autenticado con ID: ", profile.id)
+                
             } catch {
-                print("Error cargando categorias", error)
+                print("Error cargando datos iniciales: ", error)
                 isLoadingCategories = false
             }
         }

@@ -9,7 +9,9 @@ import SwiftUI
 
 
 struct HistorialView: View {
-    @State private var incidents: [Incident] = []
+    @State private var currentUserId: Int? = nil
+    @State private var incidents: [IncidentFormResponse] = []
+    @State private var selectedIncident: IncidentFormResponse? = nil
     @State private var isLoading = true
     @State private var searchText: String = ""
     @State private var selectedStatus: String = "Todos los estatus"
@@ -49,11 +51,10 @@ struct HistorialView: View {
             ScrollView {
                 LazyVStack(spacing: 12) {
                     if isLoading {
-                        ProgressView("Cargando reportes...")
-                            .padding()
-                        IncidentCardView().padding(.horizontal)
-                        IncidentCardView().padding(.horizontal)
-                        IncidentCardView().padding(.horizontal)
+                        VStack {
+                            ProgressView("Cargando reportes...")
+                                .padding()
+                        }
                     } else if incidents.isEmpty {
                         Text("No tienes reportes aún")
                             .foregroundColor(.secondary)
@@ -74,27 +75,32 @@ struct HistorialView: View {
             }
             .navigationTitle("Mi Historial")
             .task {
-                //await fetchIncidents()
+                await cargarMiHistorial()
             }
         }
     }
+    
+    private func cargarMiHistorial() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        let profileController = ProfileController(profileClient: ProfileClient())
+        let incidentesController = IncidentsController(incidensClient: IncidentsClient())
+        
+        do {
+            let profile = try await profileController.getProfile()
+            currentUserId = profile.id
+            print("Accediendo al historial del usuario ", profile.id)
+            
+            incidents = try await incidentesController.loadHistorial(id: profile.id)
+            print("Cargado el historial del usuario")
+        }
+        catch {
+            print("No se pudo acceder al historial del usuario: ", error)
+            incidents = []
+        }
+    }
 
-
-//    private func fetchIncidents() async {
-//        do {
-//            let token = TokenStorage.get(identifier: "accessToken")
-//            let fetched = try await IncidentClient().getUserIncidents(token: token!)
-//            await MainActor.run {
-//                incidents = fetched
-//                isLoading = false
-//            }
-//        } catch {
-//            print("Error al obtener incidentes:", error)
-//            await MainActor.run {
-//                isLoading = false
-//            }
-//        }
-//    }
 }
 
 
