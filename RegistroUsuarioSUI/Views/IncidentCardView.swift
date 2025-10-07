@@ -2,74 +2,112 @@
 //  IncidentCardView.swift
 //  RegistroUsuarioSUI
 //
-//  Created by Usuario on 17/09/25.
-//
 
 import SwiftUI
 
-
 struct IncidentCardView: View {
-    
     let titulo: String
     let estatus: String
     let categoria: String
     let fecha_creacion: String
     let fecha_update: String
     let usuario_alta: String
-    
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
+            // Header con icono y estatus
             HStack {
-                Text(titulo)
-                    .font(.headline)
+                Image(systemName: "exclamationmark.shield.fill")
+                    .foregroundColor(.green)
+                    .imageScale(.large)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(titulo)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    Text(categoria)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                
                 Spacer()
                 
-                NavigationLink(destination: IncidentDetailView()){
-                    Image(systemName: "eye")
-                        .foregroundColor(.green).padding(6).background(Color(.systemGray5)).clipShape(Circle())
-                }.buttonStyle(PlainButtonStyle())
                 Text(estatus)
                     .font(.caption)
-                    .padding(6)
-                    .background(Color.green.opacity(0.2))
-                    .foregroundColor(.orange)
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 8)
+                    .background(Color.green.opacity(0.15))
+                    .foregroundColor(.green)
                     .cornerRadius(8)
             }
-
-
-            Text(categoria)
-                .font(.subheadline)
-                .foregroundColor(.primary)
-
-
-            HStack {
-                Label(fecha_creacion, systemImage: "calendar")
-                Spacer()
-                Image(systemName: "paperclip")
-                Text(" X Archivos adjuntos")
+            
+            // Fechas y usuario
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Label(fecha_creacion, systemImage: "calendar")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Spacer()
+                    
+                    Label("Últ. act: \(fecha_update)", systemImage: "clock")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Text("Creado por: \(usuario_alta)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
-
-
-            Text("Última actualización:" + fecha_update)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-            Text("Creado por: " + usuario_alta)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-
+            
+            // Divider
+            Divider()
+                .padding(.vertical, 4)
+            
+            // Botón Ver más (NavigationLink)
+            HStack {
+                Spacer()
+                NavigationLink(destination: IncidentDetailView()) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "eye.fill")
+                        Text("Ver más")
+                    }
+                    .font(.subheadline.bold())
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.green.opacity(0.15))
+                    .foregroundColor(.green)
+                    .cornerRadius(8)
+                }
+                Spacer()
+            }
         }
         .padding()
-        .background(Color(.green).opacity(0.1))
-        .cornerRadius(12)
-        .shadow(radius: 2)
+        .background(Color(.systemGray6))
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
     }
 }
 
 #Preview {
-    IncidentCardView(
-        titulo: "TITULO", estatus: "ESTATUS", categoria: "CATEGORIA", fecha_creacion: "FECHA", fecha_update: "FECHA2", usuario_alta: "USUARIO"
-    )
+    VStack(spacing: 12) {
+        IncidentCardView(
+            titulo: "Phishing detectado",
+            estatus: "Abierto",
+            categoria: "Phishing",
+            fecha_creacion: "2025-10-07",
+            fecha_update: "2025-10-07",
+            usuario_alta: "omar_llano"
+        )
+        IncidentCardView(
+            titulo: "Malware detectado",
+            estatus: "Cerrado",
+            categoria: "Malware",
+            fecha_creacion: "2025-09-25",
+            fecha_update: "2025-09-28",
+            usuario_alta: "usuario2"
+        )
+    }
+    .padding()
 }

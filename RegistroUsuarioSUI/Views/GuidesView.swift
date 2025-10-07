@@ -1,10 +1,19 @@
 import SwiftUI
 
-
 struct GuidesView: View {
     @State private var categories: [CategoryFormResponse] = []
     @State private var selectedCategory: CategoryFormResponse?
     @State private var isLoading = true
+    
+    // Diccionario para íconos fijos por categoría
+    @State private var categoryIcons: [Int: String] = [:]
+    
+    // Lista de íconos posibles
+    private let icons = [
+        "lock.fill", "shield.fill", "exclamationmark.triangle.fill",
+        "globe", "key.fill", "network", "person.crop.circle.badge.exclam",
+        "bolt.fill", "flame.fill", "eye.trianglebadge.exclamationmark"
+    ]
     
     var body: some View {
         ScrollView {
@@ -34,7 +43,7 @@ struct GuidesView: View {
                     } else {
                         ForEach(categories, id: \.id) { category in
                             CategoryCardView(
-                                icon: "shield.fill",
+                                icon: categoryIcons[category.id] ?? randomIcon(for: category),
                                 title: category.titulo,
                                 description: category.descripcion,
                                 severity: mapRiskToSeverity(category.id_riesgo),
@@ -64,10 +73,23 @@ struct GuidesView: View {
         let controller = CategoriesController(categoriesClient: CategoriesClient())
         do {
             categories = try await controller.getAllCategories()
+            
+            // Asignar íconos solo si no existen
+            for category in categories {
+                if categoryIcons[category.id] == nil {
+                    categoryIcons[category.id] = icons.randomElement() ?? "shield.fill"
+                }
+            }
         } catch {
             print("Error cargando categorías:", error)
         }
         isLoading = false
+    }
+    
+    private func randomIcon(for category: CategoryFormResponse) -> String {
+        let newIcon = icons.randomElement() ?? "shield.fill"
+        categoryIcons[category.id] = newIcon
+        return newIcon
     }
     
     private func mapRiskToSeverity(_ id_riesgo: Int) -> String {
@@ -90,6 +112,3 @@ struct GuidesView: View {
         }
     }
 }
-
-
-
