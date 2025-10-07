@@ -1,0 +1,21 @@
+//
+//  CategoriesController.swift
+//  RegistroUsuarioSUI
+//
+//  Created by Usuario on 02/10/25.
+//
+
+import Foundation
+
+struct CategoriesController {
+    let categoriesClient: CategoriesClient
+    
+    func getAllCategories() async throws -> [CategoryFormResponse] {
+        return try await categoriesClient.GetAllCategories()
+    }
+    
+    func getNivelRiesgo(id:Int) async throws -> String {
+        return try await categoriesClient.GetNivelRiesgo(id: id)
+    }
+    
+}

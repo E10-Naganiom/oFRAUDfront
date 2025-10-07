@@ -85,6 +85,7 @@ struct UserRegistration: View {
                             TextField("E-mail", text: $registrationForm.correo)
                                 .autocorrectionDisabled()
                                 .textInputAutocapitalization(.never)
+                                .keyboardType(.emailAddress).autocapitalization(.none)
                         }
                     }
                     VStack(alignment: .leading, spacing:4){

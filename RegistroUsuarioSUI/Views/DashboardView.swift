@@ -279,9 +279,9 @@ struct DashboardView: View {
             }
             
             VStack {
-                IncidentCardView()
-                IncidentCardView()
-                IncidentCardView()
+//                IncidentCardView()
+//                IncidentCardView()
+//                IncidentCardView()
             }
         }
     }

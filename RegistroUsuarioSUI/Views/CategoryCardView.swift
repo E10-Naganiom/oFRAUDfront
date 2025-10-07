@@ -1,5 +1,4 @@
 //
-//  IncidentCategoryCard.swift
 //  RegistroUsuarioSUI
 //
 //  Created by Usuario on 23/09/25.
@@ -11,7 +10,7 @@ struct CategoryCardView: View {
     let icon: String
     let title: String
     let description: String
-    let severity: String
+    let severity: String?
     let severityColor: Color
     let reports: String
     let trending: Bool
@@ -29,7 +28,7 @@ struct CategoryCardView: View {
                         Text(title)
                             .font(.headline)
                         Spacer()
-                        Text(severity)
+                        Text(severity!)
                             .font(.caption.bold())
                             .foregroundColor(severityColor)
                             .padding(.horizontal, 8)

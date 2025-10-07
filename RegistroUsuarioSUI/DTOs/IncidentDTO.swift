@@ -30,7 +30,7 @@ struct IncidentFormRequest: Codable {
     var es_anonimo: Bool
 }
 
-struct IncidentFormResponse: Codable {
+struct IncidentFormResponse: Codable, Identifiable {
     let id: Int
     let titulo: String
     let id_categoria: Int

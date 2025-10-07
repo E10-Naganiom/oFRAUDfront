@@ -6,9 +6,13 @@
 //
 
 import SwiftUI
+import PhotosUI
+import UIKit
 
 
 struct ReportView: View {
+    
+    var categoriesController : CategoriesController
     
     @State private var titulo = ""
     @State private var idCategoria = 0
@@ -17,11 +21,26 @@ struct ReportView: View {
 //    @State private var fechaIncidente = Date()
     @State private var es_anonimo = false
     
+    @State private var currentUserId: Int? = nil
+    
     @State private var contactos: [MetodoContacto] = []
     @State private var descripcion = ""
     @State private var archivosAdjuntos: [String] = []
+    @State private var showSuccessAlert = false
+    @State private var navigateToDashboard = false
+    @State private var categories: [CategoryFormResponse] = []
+    @State private var selectedCategoryId: Int? = nil
+    @State private var isLoadingCategories = true
     
-    let categorias = ["Phishing", "Malware", "Ransomware", "Fraude", "Otro"]
+    @State private var selectedUIImage: UIImage?
+    @State private var showCamera = false
+    @State private var photoPickerItem: PhotosPickerItem?
+    @State private var uploadStatus: String?
+    
+    init(){
+        self.categoriesController = CategoriesController(categoriesClient: CategoriesClient())
+    }
+    
     let redesSociales = ["Twitter/X", "Facebook", "Instagram", "LinkedIn", "Otro"]
     
     var body: some View {
@@ -36,7 +55,17 @@ struct ReportView: View {
             // Info básica
             Section(header: Text("Información Básica")) {
                 TextField("Título del incidente", text: $titulo)
-                TextField("Id categoria", value: $idCategoria, format: .number)
+                if isLoadingCategories {
+                    ProgressView("Cargando categorias ...")
+                } else {
+                    Picker("Categoria", selection: $selectedCategoryId){
+                        ForEach(categories, id: \.id) { cat in
+                            Text(cat.titulo).tag(Optional(cat.id))
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                }
+//                TextField("Id categoria", value: $idCategoria, format: .number)
                 
 //                Picker("Tipo de incidente", selection: $tipoIncidente) {
 //                    ForEach(categorias, id: \.self) { cat in
@@ -137,6 +166,25 @@ struct ReportView: View {
                 }
             }
             
+            Section {
+                HStack(spacing:12){
+                    Button {
+                        showCamera = true
+                    } label: {
+                        Label("Usar Camara", systemImage: "camera.fill").frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))
+                    
+                    PhotosPicker(selection: $photoPickerItem, matching: .images) {
+                                        Label("Rollo", systemImage: "photo.on.rectangle")
+                                            .frame(maxWidth: .infinity)
+                                    }
+                                    .buttonStyle(.bordered)
+
+                }
+            }
+            
             Section{
                 HStack{
                     Text("Desea que su reporte sea anonimo?")
@@ -159,18 +207,19 @@ struct ReportView: View {
                             let controller = IncidentsController(incidensClient: IncidentsClient())
                             let response = try await controller.createIncident(
                                 titulo: titulo,
-                                id_categoria: idCategoria,
+                                id_categoria: selectedCategoryId ?? 0,
                                 nombre_atacante: atacante.isEmpty ? nil : atacante,
                                 telefono: contactos.first(where: { $0.tipo == "Teléfono"})?.valor,
                                 correo: contactos.first(where: { $0.tipo == "Correo"})?.valor,
                                 user: contactos.first(where: { $0.tipo == "Red Social"})?.valor,
                                 red_social: contactos.first(where: { $0.tipo == "Red Social"})?.redSocial,
                                 descripcion: descripcion,
-                                id_usuario: 1,
+                                id_usuario: currentUserId ?? 0,
                                 supervisor: nil,
                                 es_anonimo: es_anonimo
                             )
                             print("Incidente creado con exito", response)
+                            showSuccessAlert = true
                         } catch {
                             print("Error al crear incidente", error)
                         }
@@ -184,8 +233,33 @@ struct ReportView: View {
                         .cornerRadius(8)
                 }
             }
+            .alert("Reporte enviado", isPresented: $showSuccessAlert){
+                Button("OK") {
+                    navigateToDashboard = true
+                }
+            } message: {
+                Text("Tu reporte se envio exitosamente, Seras redirigido a la pantalla principal")
+            }
+            .navigationDestination(isPresented: $navigateToDashboard){
+                DashboardView()
+            }
         }
         .navigationTitle("Levantar Reporte")
+        .task {
+            do {
+                categories = try await categoriesController.getAllCategories()
+                isLoadingCategories = false
+                
+                let profileController = ProfileController(profileClient: ProfileClient())
+                let profile = try await profileController.getProfile()
+                currentUserId = profile.id
+                print("Usuario autenticado con ID: ", profile.id)
+                
+            } catch {
+                print("Error cargando datos iniciales: ", error)
+                isLoadingCategories = false
+            }
+        }
     }
 }
 
