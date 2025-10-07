@@ -10,7 +10,7 @@ import Foundation
 struct IncidentsClient {
     func CreateIncident(titulo: String, id_categoria: Int, nombre_atacante:String?, telefono:String?, correo:String?, user:String?, red_social:String?, descripcion:String, id_usuario:Int, supervisor:Int?, es_anonimo:Bool) async throws -> IncidentFormResponse {
         let requestForm = IncidentFormRequest(titulo: titulo, id_categoria: id_categoria, nombre_atacante: nombre_atacante, telefono: telefono, correo: correo, user: user, red_social: red_social, descripcion: descripcion, id_usuario: id_usuario, supervisor: supervisor, es_anonimo: es_anonimo)
-        let url = URL(string: "http://192.168.1.67:3000/incidents")!
+        let url = URL(string: "http://10.48.238.65:3000/incidents")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "POST"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -22,7 +22,7 @@ struct IncidentsClient {
     }
     
     func GetHistorial(id: Int) async throws -> [IncidentFormResponse] {
-        let url = URL(string: "http://192.168.1.67:3000/incidents/user/\(id)")!
+        let url = URL(string: "http://10.48.238.65:3000/incidents/user/\(id)")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
