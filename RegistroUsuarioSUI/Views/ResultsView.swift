@@ -52,17 +52,17 @@ struct ResultsView: View {
                     if isLoading {
                         ProgressView("Cargando reportes...")
                             .padding()
-                        IncidentCardView().padding(.horizontal)
-                        IncidentCardView().padding(.horizontal)
-                        IncidentCardView().padding(.horizontal)
+//                        IncidentCardView().padding(.horizontal)
+//                        IncidentCardView().padding(.horizontal)
+//                        IncidentCardView().padding(.horizontal)
                     } else if incidents.isEmpty {
                         Text("No tienes reportes aún")
                             .foregroundColor(.secondary)
                             .padding()
                     } else {
                         ForEach(incidents) { incident in
-                            IncidentCardView()
-                                .padding(.horizontal)
+                            //IncidentCardView()
+                               // .padding(.horizontal)
                         }
                     }
                 }

@@ -9,12 +9,19 @@ import SwiftUI
 
 
 struct IncidentCardView: View {
-
+    
+    let titulo: String
+    let estatus: String
+    let categoria: String
+    let fecha_creacion: String
+    let fecha_update: String
+    let usuario_alta: String
+    
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Titulo/ID del incidente")
+                Text(titulo)
                     .font(.headline)
                 Spacer()
                 
@@ -22,7 +29,7 @@ struct IncidentCardView: View {
                     Image(systemName: "eye")
                         .foregroundColor(.green).padding(6).background(Color(.systemGray5)).clipShape(Circle())
                 }.buttonStyle(PlainButtonStyle())
-                Text("Estatus del incidente")
+                Text(estatus)
                     .font(.caption)
                     .padding(6)
                     .background(Color.green.opacity(0.2))
@@ -31,13 +38,13 @@ struct IncidentCardView: View {
             }
 
 
-            Text("Categoria")
+            Text(categoria)
                 .font(.subheadline)
                 .foregroundColor(.primary)
 
 
             HStack {
-                Label("Fecha del incidente", systemImage: "calendar")
+                Label(fecha_creacion, systemImage: "calendar")
                 Spacer()
                 Image(systemName: "paperclip")
                 Text(" X Archivos adjuntos")
@@ -46,10 +53,10 @@ struct IncidentCardView: View {
             }
 
 
-            Text("Última actualización:")
+            Text("Última actualización:" + fecha_update)
                 .font(.caption2)
                 .foregroundColor(.secondary)
-            Text("Reportado por:")
+            Text("Creado por: " + usuario_alta)
                 .font(.caption2)
                 .foregroundColor(.secondary)
 
@@ -62,5 +69,7 @@ struct IncidentCardView: View {
 }
 
 #Preview {
-    IncidentCardView()
+    IncidentCardView(
+        titulo: "TITULO", estatus: "ESTATUS", categoria: "CATEGORIA", fecha_creacion: "FECHA", fecha_update: "FECHA2", usuario_alta: "USUARIO"
+    )
 }

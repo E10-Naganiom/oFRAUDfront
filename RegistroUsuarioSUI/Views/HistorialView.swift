@@ -9,14 +9,21 @@ import SwiftUI
 
 
 struct HistorialView: View {
+    var categoriesController: CategoriesController
+    
     @State private var currentUserId: Int? = nil
     @State private var incidents: [IncidentFormResponse] = []
     @State private var selectedIncident: IncidentFormResponse? = nil
     @State private var isLoading = true
     @State private var searchText: String = ""
     @State private var selectedStatus: String = "Todos los estatus"
+    @State private var categories: [CategoryFormResponse] = []
     
     let statusOptions = ["Todos los estatus", "Aprobados", "Pendientes"]
+    
+    init(){
+        self.categoriesController = CategoriesController(categoriesClient: CategoriesClient())
+    }
     
     var body: some View {
         NavigationStack {
@@ -61,7 +68,7 @@ struct HistorialView: View {
                             .padding()
                     } else {
                         ForEach(incidents) { incident in
-                            IncidentCardView()
+                            IncidentCardView(titulo:incident.titulo, estatus:"incident.id_estatus.", categoria:obtenerNombreCategoria(id:incident.id_categoria), fecha_creacion: incident.fecha_creacion,fecha_update: incident.fecha_actualizacion,usuario_alta: "incident.id_usuario")
                                 .padding(.horizontal)
                         }
                     }
@@ -94,11 +101,22 @@ struct HistorialView: View {
             
             incidents = try await incidentesController.loadHistorial(id: profile.id)
             print("Cargado el historial del usuario")
+            
+            categories = try await categoriesController.getAllCategories()
         }
         catch {
             print("No se pudo acceder al historial del usuario: ", error)
             incidents = []
         }
+    }
+    
+    private func obtenerNombreCategoria(id: Int) -> String {
+        for categoria in categories {
+            if categoria.id == id {
+                return categoria.titulo
+            }
+        }
+        return "No especificada"
     }
 
 }
