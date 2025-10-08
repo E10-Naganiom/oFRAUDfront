@@ -48,14 +48,17 @@ struct ProfileView: View {
         ScrollView {
             VStack(spacing: 20) {
                 
-                // Avatar
+                // Avatar con letra centrada
                 ZStack(alignment: .bottomTrailing) {
-                    Circle()
-                        .fill(Color.green.opacity(0.3))
-                        .frame(width: 120, height: 120)
-                    Text(String(profile.nombre.prefix(1)).uppercased())
-                        .font(.system(size: 64, weight:.bold))
-                        .foregroundColor(.green)
+                    ZStack {
+                        Circle()
+                            .fill(Color.green.opacity(0.3))
+                            .frame(width: 120, height: 120)
+                        
+                        Text(String(profile.nombre.prefix(1)).uppercased())
+                            .font(.system(size: 64, weight: .bold))
+                            .foregroundColor(.green)
+                    }
                     
                     // Botón lápiz
                     Button(action: { isEditing.toggle() }) {

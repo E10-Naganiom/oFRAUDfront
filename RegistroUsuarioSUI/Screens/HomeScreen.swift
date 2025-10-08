@@ -39,7 +39,7 @@ struct HomeScreen: View {
                 }label: {
                     Label("Perfil", systemImage: "person.crop.circle")
                 }
-            }
+            }.tint(.green)
         }
 }
 
