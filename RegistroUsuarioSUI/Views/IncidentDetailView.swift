@@ -9,7 +9,17 @@ import SwiftUI
 
 
 struct IncidentDetailView: View {
-
+    
+    let titulo: String
+    let categoria: String
+    let estatus: String
+    let fechaCreacion: String
+    let fechaActualizacion: String
+    let descripcion: String
+    let telefono: String
+    let email: String
+    let user: String
+    let red: String
     
     var body: some View {
         ScrollView {
@@ -28,30 +38,22 @@ struct IncidentDetailView: View {
                 
 
                 VStack(alignment: .leading, spacing: 12) {
+                    
                     HStack {
-                        Text("ID del Incidente:")
+                        Text("Titulo:")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text("ID Incidente")
+                        Text(titulo)
                             .font(.subheadline.bold())
                     }
                     
                     HStack {
-                        Text("Titulo del Incidente:")
+                        Text("Categoria:")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text("Titulo Incidente")
-                            .font(.subheadline.bold())
-                    }
-                    
-                    HStack {
-                        Text("Categoria del Incidente:")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        Text("Categoria Incidente")
+                        Text(categoria)
                             .font(.subheadline.bold())
                     }
                     
@@ -60,7 +62,7 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text("Estatus del incidente")
+                        Text(estatus)
                             .font(.subheadline.bold())
                             .padding(.horizontal, 10)
                             .padding(.vertical, 4)
@@ -74,7 +76,7 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text("Fecha creacion")
+                        Text(fechaCreacion)
                             .font(.subheadline)
                     }
                     
@@ -83,7 +85,7 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text("Fecha actualizacion")
+                        Text(fechaActualizacion)
                             .font(.subheadline)
                     }
                 }
@@ -96,7 +98,7 @@ struct IncidentDetailView: View {
                     Text("Descripcion del incidente").font(.headline)
                     Spacer()
                     HStack {
-                        Text ("Aqui va el detalle del incidente")
+                        Text (descripcion)
                     }
     
                 }
@@ -191,5 +193,5 @@ struct IncidentDetailView: View {
 
 
 #Preview {
-    IncidentDetailView()
+    IncidentDetailView(titulo: "Probando", categoria: "Categoria", estatus: "Estatus", fechaCreacion: "FechaCreacion", fechaActualizacion: "FechaActualizacion", descripcion: "descripcion", telefono: "telefono", email: "email", user: "user", red: "red")
 }

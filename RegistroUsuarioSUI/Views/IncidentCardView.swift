@@ -12,6 +12,9 @@ struct IncidentCardView: View {
     let fecha_creacion: String
     let fecha_update: String
     let usuario_alta: String
+    
+    @State private var categories: [CategoryFormResponse] = []
+    
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -68,7 +71,7 @@ struct IncidentCardView: View {
             // Botón Ver más (NavigationLink)
             HStack {
                 Spacer()
-                NavigationLink(destination: IncidentDetailView()) {
+                NavigationLink(destination: IncidentDetailView(titulo: titulo, categoria: categoria, estatus: estatus, fechaCreacion: fecha_creacion, fechaActualizacion: fecha_update, descripcion: "descripcion", telefono: "telefono", email: "email", user: "user", red: "red")) {
                     HStack(spacing: 4) {
                         Image(systemName: "eye.fill")
                         Text("Ver más")

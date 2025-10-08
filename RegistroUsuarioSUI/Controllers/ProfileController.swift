@@ -26,7 +26,9 @@ struct ProfileController {
             profileObs.nombre = response.profile.nombre
             profileObs.apellido = response.profile.apellido
             profileObs.email = response.profile.email
-            profileObs.contrasena = response.profile.contrasena
+            profileObs.contrasena = response.profile.contr
+        
+        asena
             return profileObs
         }
         
