@@ -6,14 +6,11 @@
 import SwiftUI
 
 struct IncidentCardView: View {
-    let titulo: String
-    let estatus: String
-    let categoria: String
-    let fecha_creacion: String
-    let fecha_update: String
-    let usuario_alta: String
+    let incident : IncidentFormResponse
     
-    @State private var categories: [CategoryFormResponse] = []
+    let categories: [CategoryFormResponse]
+    
+    @State private var estatus: String = "Cargando ..."
     
 
     var body: some View {
@@ -25,11 +22,11 @@ struct IncidentCardView: View {
                     .imageScale(.large)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(titulo)
+                    Text(incident.titulo)
                         .font(.headline)
                         .foregroundColor(.primary)
                     
-                    Text(categoria)
+                    Text(obtenerNombreCategoria(id: incident.id_categoria))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -48,18 +45,18 @@ struct IncidentCardView: View {
             // Fechas y usuario
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Label(fecha_creacion, systemImage: "calendar")
+                    Label(incident.fecha_creacion, systemImage: "calendar")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
                     Spacer()
                     
-                    Label("Últ. act: \(fecha_update)", systemImage: "clock")
+                    Label("Últ. act: \(incident.fecha_actualizacion)", systemImage: "clock")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
                 
-                Text("Creado por: \(usuario_alta)")
+                Text("Creado por: \(incident.id_usuario)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -71,7 +68,7 @@ struct IncidentCardView: View {
             // Botón Ver más (NavigationLink)
             HStack {
                 Spacer()
-                NavigationLink(destination: IncidentDetailView(titulo: titulo, categoria: categoria, estatus: estatus, fechaCreacion: fecha_creacion, fechaActualizacion: fecha_update, descripcion: "descripcion", telefono: "telefono", email: "email", user: "user", red: "red")) {
+                NavigationLink(destination: IncidentDetailView(incidente: incident, categories: categories, estatus: estatus)) {
                     HStack(spacing: 4) {
                         Image(systemName: "eye.fill")
                         Text("Ver más")
@@ -90,27 +87,51 @@ struct IncidentCardView: View {
         .background(Color(.systemGray6))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
+        .task {
+            await fetchEstatus(id: incident.id_estatus)
+        }
+    }
+    private func obtenerNombreCategoria(id: Int) -> String {
+        for categoria in categories {
+            if categoria.id == id {
+                return categoria.titulo
+            }
+        }
+        return "No especificada"
+    }
+    
+    private func fetchEstatus(id: Int) async {
+        let incidentsController = IncidentsController(incidensClient: IncidentsClient())
+        do {
+            estatus = try await incidentsController.getStatus(id: id)
+        }
+        catch {
+            print("No se pudo obtener el estatus con id \(id)")
+            estatus = "Desconocido"
+        }
     }
 }
 
-#Preview {
-    VStack(spacing: 12) {
-        IncidentCardView(
-            titulo: "Phishing detectado",
-            estatus: "Abierto",
-            categoria: "Phishing",
-            fecha_creacion: "2025-10-07",
-            fecha_update: "2025-10-07",
-            usuario_alta: "omar_llano"
-        )
-        IncidentCardView(
-            titulo: "Malware detectado",
-            estatus: "Cerrado",
-            categoria: "Malware",
-            fecha_creacion: "2025-09-25",
-            fecha_update: "2025-09-28",
-            usuario_alta: "usuario2"
-        )
-    }
-    .padding()
-}
+//#Preview {
+//    VStack(spacing: 12) {
+//        IncidentCardView(
+//            incident: IncidentFormResponse (
+//                id: 1,
+//                titulo: "Malware detectado",
+//                id_categoria: 1,
+//                nombre_atacante: "Barbie",
+//                telefono: "123",
+//                correo: "abc@tec.mx",
+//                user_red: "barbie",
+//                red_social: "TikTok",
+//                descripcion: "Hola hola",
+//                fecha_creacion: "Ayer",
+//                fecha_actualizacion: "Hoy",
+//                id_usuario: 1,
+//                supervisor: 2,
+//                id_estatus: 1,
+//                es_anonimo: true
+//        ))
+//    }
+//    .padding()
+//}

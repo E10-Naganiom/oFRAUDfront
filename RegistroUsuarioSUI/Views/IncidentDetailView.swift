@@ -10,16 +10,11 @@ import SwiftUI
 
 struct IncidentDetailView: View {
     
-    let titulo: String
-    let categoria: String
+    let incidente : IncidentFormResponse
+    let categories: [CategoryFormResponse]
+    
     let estatus: String
-    let fechaCreacion: String
-    let fechaActualizacion: String
-    let descripcion: String
-    let telefono: String
-    let email: String
-    let user: String
-    let red: String
+    
     
     var body: some View {
         ScrollView {
@@ -44,7 +39,7 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text(titulo)
+                        Text(incidente.titulo)
                             .font(.subheadline.bold())
                     }
                     
@@ -53,7 +48,7 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text(categoria)
+                        Text(obtenerNombreCategoria(id: incidente.id_categoria))
                             .font(.subheadline.bold())
                     }
                     
@@ -62,13 +57,13 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text(estatus)
-                            .font(.subheadline.bold())
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .background(Color.green.opacity(0.2))
-                            .foregroundColor(.orange)
-                            .cornerRadius(12)
+                            Text(estatus)
+                                .font(.subheadline.bold())
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(Color.green.opacity(0.2))
+                                .foregroundColor(.orange)
+                                .cornerRadius(12)
                     }
                     
                     HStack {
@@ -76,7 +71,7 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text(fechaCreacion)
+                        Text(incidente.fecha_creacion)
                             .font(.subheadline)
                     }
                     
@@ -85,7 +80,7 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text(fechaActualizacion)
+                        Text(incidente.fecha_actualizacion)
                             .font(.subheadline)
                     }
                 }
@@ -98,7 +93,7 @@ struct IncidentDetailView: View {
                     Text("Descripcion del incidente").font(.headline)
                     Spacer()
                     HStack {
-                        Text (descripcion)
+                        Text (incidente.descripcion)
                     }
     
                 }
@@ -185,6 +180,15 @@ struct IncidentDetailView: View {
         .navigationTitle("Incidente")
         .navigationBarTitleDisplayMode(.inline)
     }
+    private func obtenerNombreCategoria(id: Int) -> String {
+        for categoria in categories {
+            if categoria.id == id {
+                return categoria.titulo
+            }
+        }
+        return "No especificada"
+    }
+    
 }
 
 
@@ -192,6 +196,24 @@ struct IncidentDetailView: View {
 
 
 
-#Preview {
-    IncidentDetailView(titulo: "Probando", categoria: "Categoria", estatus: "Estatus", fechaCreacion: "FechaCreacion", fechaActualizacion: "FechaActualizacion", descripcion: "descripcion", telefono: "telefono", email: "email", user: "user", red: "red")
-}
+//#Preview {
+//    IncidentDetailView(
+//        incidente: IncidentFormResponse (
+//            id: 1,
+//            titulo: "Malware detectado",
+//            id_categoria: 1,
+//            nombre_atacante: "Barbie",
+//            telefono: "123",
+//            correo: "abc@tec.mx",
+//            user_red: "barbie",
+//            red_social: "TikTok",
+//            descripcion: "Hola hola",
+//            fecha_creacion: "Ayer",
+//            fecha_actualizacion: "Hoy",
+//            id_usuario: 1,
+//            supervisor: 2,
+//            id_estatus: 1,
+//            es_anonimo: true
+//    )
+//    )
+//}

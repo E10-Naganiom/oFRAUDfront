@@ -18,4 +18,8 @@ struct IncidentsController {
         return try await incidensClient.GetHistorial(id: id)
     }
     
+    func getStatus(id: Int) async throws -> String {
+        return try await incidensClient.GetEstatus(id: id)
+    }
+    
 }

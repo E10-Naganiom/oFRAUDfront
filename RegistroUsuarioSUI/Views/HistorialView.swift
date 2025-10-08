@@ -68,7 +68,7 @@ struct HistorialView: View {
                             .padding()
                     } else {
                         ForEach(incidents) { incident in
-                            IncidentCardView(titulo:incident.titulo, estatus:"incident.id_estatus.", categoria:obtenerNombreCategoria(id:incident.id_categoria), fecha_creacion: incident.fecha_creacion,fecha_update: incident.fecha_actualizacion,usuario_alta: "incident.id_usuario")
+                            IncidentCardView(incident: incident, categories: categories)
                                 .padding(.horizontal)
                         }
                     }
