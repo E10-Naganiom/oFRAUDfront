@@ -16,12 +16,9 @@ struct ValidationSummary: View {
                     .foregroundStyle(.green)
             }
             else{
-                Text("Lista de errores:")
-                    .font(.headline)
-                    .foregroundStyle(.red)
                 ForEach(errors, id: \.self){error in
-                    Text("❌ \(error)")
-                        .foregroundStyle(.red)
+                    Text("- \(error)")
+                        .foregroundStyle(.red).frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
         }

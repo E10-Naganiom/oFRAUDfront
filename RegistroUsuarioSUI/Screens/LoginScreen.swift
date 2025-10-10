@@ -17,6 +17,15 @@ struct LoginScreen: View {
     
     private func login() async {
         await MainActor.run { errorMessages.removeAll()}
+        
+        // Validar antes de intentar login
+        let loginForm = UserLoginForm(correo: email, contrasena: password)
+        errorMessages = loginForm.validate()
+        
+        if !errorMessages.isEmpty {
+            return
+        }
+        
         do{
             let success = try await authenticationController.loginUser(email: email, password: password)
             if success {
@@ -62,61 +71,65 @@ struct LoginScreen: View {
                 Text("Inicio de Sesion").font(.title2.bold()).foregroundColor(.green)
                 Text("Ingresa a tu cuenta para continuar")
             }
-            Form{
-//                Text("Inicio de sesión")
-//                    .font(.title)
-//                    .foregroundStyle(.blue)
-//                    .frame(maxWidth: .infinity)
-                Section{
-                    VStack(alignment: .leading, spacing:4){
-                        Text("Correo electronico").font(.caption).foregroundColor(.gray)
-                        HStack{
-                            Image(systemName:"envelope.fill")
-                            TextField("Correo electrónico", text: $email)
-                                .keyboardType(.emailAddress).autocapitalization(.none)
+            
+            ScrollViewReader { proxy in
+                Form{
+                    Section{
+                        VStack(alignment: .leading, spacing:4){
+                            Text("Correo electronico").font(.caption).foregroundColor(.gray)
+                            HStack{
+                                Image(systemName:"envelope.fill")
+                                TextField("Correo electrónico", text: $email)
+                                    .keyboardType(.emailAddress).autocapitalization(.none)
+                            }
                         }
-                    }
-                    VStack(alignment: .leading, spacing:4){
-                        Text("Contraseña").font(.caption).foregroundColor(.gray)
-                        HStack{
-                            Image(systemName:"lock.fill")
-                            SecureField("Contraseña", text: $password)
+                        VStack(alignment: .leading, spacing:4){
+                            Text("Contraseña").font(.caption).foregroundColor(.gray)
+                            HStack{
+                                Image(systemName:"lock.fill")
+                                SecureField("Contraseña", text: $password)
+                            }
+                        }
+                        
+                        Button(action: {
+                            Task{
+                                await login()
+                                if !errorMessages.isEmpty {
+                                    withAnimation {
+                                        proxy.scrollTo("errorSection", anchor: .top)
+                                    }
+                                }
+                            }
+                            
+                        }){
+                            Text("Iniciar sesión")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .foregroundColor(.white)
+                                .background(Color.green)
+                                .cornerRadius(10)
                         }
                     }
                     
-                    Button(action: {
-                        
-                        Task{
-                            await login()
+                    // ValidationSummary entre el botón y el registro
+                    if(!errorMessages.isEmpty){
+                        Section {
+                            ValidationSummary(errors: errorMessages)
                         }
+                        .id("errorSection")
+                    }
+                    
+                    VStack(spacing:8){
+                        HStack(spacing: 4){
+                            Text("No tienes una cuenta?")
+                            Text("Registrarse").foregroundColor(.green).bold().onTapGesture {
+                                navigateToRegister = true
+                            }
+                        }.frame(maxWidth: .infinity, alignment: .center)
                         
-                    }){
-                        Text("Iniciar sesión")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .foregroundColor(.white)
-                            .background(Color.green)
-                            .cornerRadius(10)
+                        Text ("Al continuar, aceptas nuestros términos de servicio y política de privacidad.").font(.footnote).foregroundColor(.gray).multilineTextAlignment(.center).padding(.top, 8)
                     }
                 }
-                VStack(spacing:8){
-                    HStack(spacing: 4){
-                        Text("No tienes una cuenta?")
-                        Text("Registrarse").foregroundColor(.green).bold().onTapGesture {
-                            navigateToRegister = true
-                        }
-                    }.frame(maxWidth: .infinity, alignment: .center)
-                    
-                    Text ("Al continuar, aceptas nuestros términos de servicio y política de privacidad.").font(.footnote).foregroundColor(.gray).multilineTextAlignment(.center).padding(.top, 8)
-                }
-                
-
-//                NavigationLink("Registrarse"){
-//                    UserRegistration()
-//                }
-            }
-            if(!errorMessages.isEmpty){
-                ValidationSummary(errors: errorMessages)
             }
         }.navigationTitle("Login")
             .navigationDestination(isPresented: $navigateToRegister){
@@ -133,14 +146,12 @@ extension LoginScreen{
         func validate() -> [String]{
             var errors: [String] = []
             
-            if correo.esVacío{
-                errors.append( "El correo es requerido")
+            if correo.isEmpty{
+                errors.append("El correo es requerido")
             }
-            if contrasena.esVacío{
-                errors.append( "La contrasena es requerida")
+            if contrasena.isEmpty{
+                errors.append("La contraseña es requerida")
             }
-
-            
             return errors
         }
     }

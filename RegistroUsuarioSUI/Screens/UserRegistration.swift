@@ -62,100 +62,110 @@ struct UserRegistration: View {
                 Text("Registro").font(.title2.bold()).foregroundColor(.green)
                 Text("Completa tus datos para crear una cuenta")
             }
-            Form {
-                Section{
-                    VStack(alignment: .leading, spacing:4){
-                        Text("Nombre").font(.caption).foregroundColor(.gray)
-                        HStack{
-                            Image(systemName:"person.crop.circle.fill")
-                            TextField("Nombre", text: $registrationForm.nombre)
-                        }
-                    }
-                    VStack(alignment: .leading, spacing:4){
-                        Text("Apellido").font(.caption).foregroundColor(.gray)
-                        HStack{
-                            Image(systemName:"person.crop.circle")
-                            TextField("Apellido", text: $registrationForm.apellido)
-                        }
-                    }
-                    VStack(alignment: .leading, spacing:4){
-                        Text("Correo electrónico").font(.caption).foregroundColor(.gray)
-                        HStack{
-                            Image(systemName:"envelope.fill")
-                            TextField("E-mail", text: $registrationForm.correo)
-                                .autocorrectionDisabled()
-                                .textInputAutocapitalization(.never)
-                                .keyboardType(.emailAddress).autocapitalization(.none)
-                        }
-                    }
-                    VStack(alignment: .leading, spacing:4){
-                        Text("Contraseña").font(.caption).foregroundColor(.gray)
-                        HStack{
-                            Image(systemName:"lock.fill")
-                            SecureField("Contrasena", text: $registrationForm.contrasena)
-                        }
-                    }
-                }
-                
-                // Terms and conditions section
-                Section {
-                    HStack(alignment: .top, spacing: 8) {
-                        Button(action: {
-                            acceptedTerms.toggle()
-                        }) {
-                            Image(systemName: acceptedTerms ? "checkmark.square.fill" : "square")
-                                .foregroundColor(acceptedTerms ? .green : .gray)
-                                .font(.title2)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        
-                        (Text("Acepto los ") +
-                         Text("términos de servicio y políticas de privacidad")
-                            .foregroundColor(.green)
-                            .underline())
-                        .font(.footnote)
-                        .onTapGesture {
-                            // Only trigger on the green text area
-                            // TODO: Navigate to terms of service
-                            print("Navigate to terms of service")
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-                
-                Section {
-                    Button(action: {
-                        errorMessages = registrationForm.validate(acceptedTerms: acceptedTerms)
-                        if errorMessages.isEmpty{
-                            Task{
-                                await register()
+            
+            ScrollViewReader { proxy in
+                Form {
+                    Section{
+                        VStack(alignment: .leading, spacing:4){
+                            Text("Nombre").font(.caption).foregroundColor(.gray)
+                            HStack{
+                                Image(systemName:"person.crop.circle.fill")
+                                TextField("Nombre", text: $registrationForm.nombre)
                             }
                         }
-                        
-                    }){
-                        Text("Registrar")
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .foregroundColor(.white)
-                            .background(acceptedTerms ? Color.green : Color.gray)
-                            .cornerRadius(10)
-                    }
-                    .disabled(!acceptedTerms)
-                }
-                
-                VStack(spacing:8){
-                    HStack(spacing: 4){
-                        Text("Ya tienes una cuenta?")
-                        Text("Inicia sesión").foregroundColor(.green).bold().onTapGesture {
-                            navigateToLogin = true
+                        VStack(alignment: .leading, spacing:4){
+                            Text("Apellido").font(.caption).foregroundColor(.gray)
+                            HStack{
+                                Image(systemName:"person.crop.circle")
+                                TextField("Apellido", text: $registrationForm.apellido)
+                            }
                         }
-                    }.frame(maxWidth: .infinity, alignment: .center)
+                        VStack(alignment: .leading, spacing:4){
+                            Text("Correo electrónico").font(.caption).foregroundColor(.gray)
+                            HStack{
+                                Image(systemName:"envelope.fill")
+                                TextField("E-mail", text: $registrationForm.correo)
+                                    .autocorrectionDisabled()
+                                    .textInputAutocapitalization(.never)
+                                    .keyboardType(.emailAddress).autocapitalization(.none)
+                            }
+                        }
+                        VStack(alignment: .leading, spacing:4){
+                            Text("Contraseña").font(.caption).foregroundColor(.gray)
+                            HStack{
+                                Image(systemName:"lock.fill")
+                                SecureField("Contrasena", text: $registrationForm.contrasena)
+                            }
+                        }
+                    }
+                    
+                    // Terms and conditions section
+                    Section {
+                        HStack(alignment: .top, spacing: 8) {
+                            Button(action: {
+                                acceptedTerms.toggle()
+                            }) {
+                                Image(systemName: acceptedTerms ? "checkmark.square.fill" : "square")
+                                    .foregroundColor(acceptedTerms ? .green : .gray)
+                                    .font(.title2)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            
+                            (Text("Acepto los ") +
+                             Text("términos de servicio y políticas de privacidad")
+                                .foregroundColor(.green)
+                                .underline())
+                            .font(.footnote)
+                            .onTapGesture {
+                                // Only trigger on the green text area
+                                // TODO: Navigate to terms of service
+                                print("Navigate to terms of service")
+                            }
+                        }
+                        .padding(.vertical, 4)
+                        
+                        Section {
+                            Button(action: {
+                                errorMessages = registrationForm.validate(acceptedTerms: acceptedTerms)
+                                if errorMessages.isEmpty{
+                                    Task{
+                                        await register()
+                                    }
+                                } else {
+                                    withAnimation {
+                                        proxy.scrollTo("errorSection", anchor: .top)
+                                    }
+                                }
+                                
+                            }){
+                                Text("Registrar")
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .foregroundColor(.white)
+                                    .background(acceptedTerms ? Color.green : Color.gray)
+                                    .cornerRadius(10)
+                            }
+                            .disabled(!acceptedTerms)
+                        }
+                    }
+                    
+                    if !errorMessages.isEmpty{
+                        Section {
+                            ValidationSummary(errors: errorMessages)
+                        }
+                        .id("errorSection")
+                    }
+                    
+                    VStack(spacing:8){
+                        HStack(spacing: 4){
+                            Text("Ya tienes una cuenta?")
+                            Text("Inicia sesión").foregroundColor(.green).bold().onTapGesture {
+                                navigateToLogin = true
+                            }
+                        }.frame(maxWidth: .infinity, alignment: .center)
+                    }
                 }
             }
-            if !errorMessages.isEmpty{
-                ValidationSummary(errors: errorMessages)
-            }
-            
         }
         .navigationDestination(isPresented: $navigateToLogin){
             LoginScreen()
@@ -180,23 +190,41 @@ extension UserRegistration{
         func validate(acceptedTerms: Bool) -> [String]{
             var errors: [String] = []
             
-            if nombre.esVacío{
+            if nombre.isEmpty{
                 errors.append("El nombre es requerido")
             }
-            if apellido.esVacío{
+            if apellido.isEmpty{
                 errors.append("El apellido es requerido")
             }
-            if correo.esVacío{
+            if correo.isEmpty{
                 errors.append( "El correo es requerido")
             }
-            if contrasena.esVacío{
+            if contrasena.isEmpty{
                 errors.append( "La contrasena es requerida")
             }
-            if !correo.esCorreoValido{
-                errors.append("El correo no es valido")
+            if !correo.isEmpty{
+                if !correo.esCorreoValido{
+                    errors.append("El correo no es válido")
+                }
             }
-            if !contrasena.esPasswordValido{
-                errors.append("La contrasena no cumple con el requerimiento de tener al menos 8 caracteres")
+            if !contrasena.isEmpty {
+                var passwordErrors: [String] = []
+                
+                if contrasena.count < 8 {
+                    passwordErrors.append("al menos 8 caracteres")
+                }
+                
+                if !contrasena.contains(where: { $0.isUppercase }) {
+                    passwordErrors.append("al menos 1 mayúscula")
+                }
+                
+                if !contrasena.contains(where: { $0.isNumber }) {
+                    passwordErrors.append("al menos 1 número")
+                }
+                
+                if !passwordErrors.isEmpty {
+                    errors.append("La contraseña debe tener: \(passwordErrors.joined(separator: ", "))")
+                }
             }
             if !acceptedTerms{
                 errors.append("Debes aceptar los términos de servicio y política de privacidad")
