@@ -11,6 +11,7 @@ struct IncidentCardView: View {
     let categories: [CategoryFormResponse]
     
     @State private var estatus: String = "Cargando ..."
+    @State private var nombreCompleto: String = "Cargando ..."
     
 
     var body: some View {
@@ -56,9 +57,16 @@ struct IncidentCardView: View {
                         .foregroundColor(.secondary)
                 }
                 
-                Text("Creado por: \(incident.id_usuario)")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                if(!incident.es_anonimo){
+                    Text("Creado por: " + nombreCompleto)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else{
+                    Text("Creado por usurio anonimo ")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
             }
             
             // Divider
@@ -88,7 +96,7 @@ struct IncidentCardView: View {
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
         .task {
-            await fetchEstatus(id: incident.id_estatus)
+            await fetchDatosIncidente(incident:incident)
         }
     }
     private func obtenerNombreCategoria(id: Int) -> String {
@@ -100,13 +108,14 @@ struct IncidentCardView: View {
         return "No especificada"
     }
     
-    private func fetchEstatus(id: Int) async {
+    private func fetchDatosIncidente(incident: IncidentFormResponse) async {
         let incidentsController = IncidentsController(incidensClient: IncidentsClient())
         do {
-            estatus = try await incidentsController.getStatus(id: id)
+            estatus = try await incidentsController.getStatus(id: incident.id_estatus)
+            nombreCompleto = try await incidentsController.getCompleteName(id: incident.id_usuario)
         }
         catch {
-            print("No se pudo obtener el estatus con id \(id)")
+            print("No se pudo obtener datos del incidente \(incident.id)")
             estatus = "Desconocido"
         }
     }

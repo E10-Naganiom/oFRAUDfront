@@ -22,4 +22,8 @@ struct IncidentsController {
         return try await incidensClient.GetEstatus(id: id)
     }
     
+    func getCompleteName(id: Int) async throws -> String {
+        return try await incidensClient.GetUsuario(id: id)
+    }
+    
 }

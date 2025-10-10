@@ -2,8 +2,8 @@
 //  LoginScreen.swift
 //  RegistroUsuario452
 //
-//  Created by José Molina on 05/09/25.
-//
+
+//  Created by Usuario on 05/09/25.
 
 import SwiftUI
 
