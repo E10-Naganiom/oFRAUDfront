@@ -76,7 +76,7 @@ struct IncidentCardView: View {
             // Botón Ver más (NavigationLink)
             HStack {
                 Spacer()
-                NavigationLink(destination: IncidentDetailView(incidente: incident, categories: categories, estatus: estatus)) {
+                NavigationLink(destination: IncidentDetailView(incidente: incident, categories: categories, estatus: estatus, nombreCompleto: nombreCompleto)) {
                     HStack(spacing: 4) {
                         Image(systemName: "eye.fill")
                         Text("Ver más")

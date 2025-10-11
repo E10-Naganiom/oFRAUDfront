@@ -14,6 +14,7 @@ struct IncidentDetailView: View {
     let categories: [CategoryFormResponse]
     
     let estatus: String
+    let nombreCompleto: String
     
     
     var body: some View {
@@ -53,6 +54,21 @@ struct IncidentDetailView: View {
                     }
                     
                     HStack {
+                        Text("Usuario:")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        if(!incidente.es_anonimo){
+                            Text(nombreCompleto)
+                                .font(.subheadline.bold())
+                        }
+                        else {
+                            Text("Anonimo")
+                                .font(.subheadline.bold())
+                        }
+                    }
+                    
+                    HStack {
                         Text("Estado:")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
@@ -83,13 +99,14 @@ struct IncidentDetailView: View {
                         Text(formatISODate(incidente.fecha_actualizacion))
                             .font(.subheadline)
                     }
+                    
                 }
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(16)
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                 
-                VStack(alignment: .leading){
+                VStack(alignment: .leading, spacing: 12){
                     Text("Descripcion del incidente").font(.headline)
                     Spacer()
                     HStack {
@@ -102,36 +119,26 @@ struct IncidentDetailView: View {
                 .cornerRadius(16)
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                 
-                //if !incident.attachments.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Archivos adjuntos")
-                            .font(.headline)
-                        //ForEach(incident.attachments, id: \.self) { file in
-                            HStack {
-                                Image(systemName: "paperclip")
-                                    .foregroundColor(.blue)
-                                Text("Archivo")
-                                    .foregroundColor(.blue)
-                                Spacer()
-                                Image(systemName: "arrow.down.circle.fill")
-                                    .foregroundColor(.blue)
-                            }
-                            .padding(8)
-                            .background(Color(.systemGray5))
-                            .cornerRadius(8)
-                        //}
-                    }
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(16)
-                    .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
-                //}
-                
 
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Medios de contacto")
                         .font(.headline)
                         .padding(.bottom, 4)
+                    
+                    // Atacante
+                    HStack(spacing: 12) {
+                        Image(systemName: "person.badge.shield.exclamationmark.fill")
+                            .foregroundColor(.red)
+                            .font(.title3)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Atacante")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text((incidente.nombre_atacante ?? "").isEmpty ? "No proporcionado" : incidente.nombre_atacante!)
+                                .font(.subheadline.bold())
+                        }
+                        Spacer()
+                    }
                     
                     // Teléfono
                     HStack(spacing: 12) {
@@ -151,7 +158,7 @@ struct IncidentDetailView: View {
                     // Correo
                     HStack(spacing: 12) {
                         Image(systemName: "envelope.fill")
-                            .foregroundColor(.red)
+                            .foregroundColor(.yellow)
                             .font(.title3)
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Correo electrónico")
@@ -165,7 +172,7 @@ struct IncidentDetailView: View {
                     
                     // Red social
                     HStack(spacing: 12) {
-                        Image(systemName: "person.crop.circle.fill")
+                        Image(systemName: "person.crop.circle.fill.badge.plus")
                             .foregroundColor(.blue)
                             .font(.title3)
                         VStack(alignment: .leading, spacing: 4) {
@@ -185,6 +192,70 @@ struct IncidentDetailView: View {
                 .background(Color(.systemGray6))
                 .cornerRadius(16)
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                
+                
+                if let evidencias = incidente.files, !evidencias.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Evidencias")
+                            .font(.headline)
+                        
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 10)], spacing: 10) {
+                            ForEach(evidencias) { evidencia in
+                                if let url = URL(string: evidencia.url),
+                                   evidencia.url.lowercased().hasSuffix(".jpg") ||
+                                   evidencia.url.lowercased().hasSuffix(".jpeg") ||
+                                   evidencia.url.lowercased().hasSuffix(".png") {
+                                    
+                                    AsyncImage(url: url) { phase in
+                                        switch phase {
+                                        case .empty:
+                                            ProgressView()
+                                                .frame(width: 120, height: 120)
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 120, height: 120)
+                                                .clipped()
+                                                .cornerRadius(12)
+                                                .shadow(radius: 2)
+                                        case .failure:
+                                            Image(systemName: "xmark.circle")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 50, height: 50)
+                                                .foregroundColor(.red)
+                                        @unknown default:
+                                            EmptyView()
+                                        }
+                                    }
+                                } else {
+                                    VStack(spacing: 8) {
+                                        Image(systemName: "doc.text.fill")
+                                            .resizable()
+                                            .frame(width: 40, height: 50)
+                                            .foregroundColor(.gray)
+                                        Text("Documento")
+                                            .font(.caption2)
+                                    }
+                                    .frame(width: 120, height: 120)
+                                    .background(Color(.systemGray6))
+                                    .cornerRadius(12)
+                                }
+                            }
+                        }
+                        .padding(.top, 5)
+                    }
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(16)
+                    .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                } else {
+                    Text("No hay evidencias registradas.")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                        .padding()
+                }
 
             }
             .padding()

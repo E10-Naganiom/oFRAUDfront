@@ -7,15 +7,6 @@
  import Foundation
 import SwiftUICore
 
-struct Incident: Identifiable, Decodable {
-        let id: Int
-    let titulo: String
-    let status: String
-    let createdAt: String
-    let lastUpdated: String
-    let attachments: Int
-}
-
 
 struct IncidentFormRequest: Codable {
     var titulo: String
@@ -29,6 +20,7 @@ struct IncidentFormRequest: Codable {
     var id_usuario: Int
     var supervisor: Int?
     var es_anonimo: Bool
+    
 }
 
 struct IncidentFormResponse: Codable, Identifiable {
@@ -41,6 +33,7 @@ struct IncidentFormResponse: Codable, Identifiable {
     let supervisor: Int?
     let id_estatus: Int
     let es_anonimo: Bool
+    let files: [Evidence]?
     
     enum CodingKeys: String, CodingKey {
         case id, titulo, id_categoria
@@ -49,6 +42,18 @@ struct IncidentFormResponse: Codable, Identifiable {
         case descripcion, fecha_creacion, fecha_actualizacion
         case id_usuario, supervisor
         case id_estatus, es_anonimo
+        case files
+    }
+}
+
+struct Evidence : Codable, Identifiable {
+    let id: Int
+    let id_incidente: Int
+    let url: String
+    
+    enum CodingKeys: String, CodingKey {
+        case id, id_incidente
+        case url
     }
 }
 

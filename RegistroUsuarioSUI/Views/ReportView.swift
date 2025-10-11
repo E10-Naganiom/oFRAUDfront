@@ -25,7 +25,7 @@ struct ReportView: View {
     
     @State private var contactos: [MetodoContacto] = []
     @State private var descripcion = ""
-    @State private var archivosAdjuntos: [String] = []
+
     @State private var showSuccessAlert = false
     @State private var navigateToDashboard = false
     @State private var categories: [CategoryFormResponse] = []
@@ -36,6 +36,7 @@ struct ReportView: View {
     @State private var showCamera = false
     @State private var photoPickerItem: PhotosPickerItem?
     @State private var uploadStatus: String?
+    @State private var archivosAdjuntos: [Data] = []
     
     init(){
         self.categoriesController = CategoriesController(categoriesClient: CategoriesClient())
@@ -142,26 +143,19 @@ struct ReportView: View {
             }
             
             // Archivos adjuntos
-            Section(
-                header: HStack {
-                    Text("Archivos adjuntos (máx. 5)")
-                    Spacer()
-                    Button(action: {
-                        if archivosAdjuntos.count < 5 {
-                            archivosAdjuntos.append("archivo\(archivosAdjuntos.count+1).pdf")
-                        }
-                    }) {
-                        Image(systemName: "paperclip.circle.fill")
-                            .foregroundColor(.blue)
-                    }
-                }
-            ) {
+            Section(header: Text("Archivos adjuntos (máx. 5)")) {
                 if archivosAdjuntos.isEmpty {
                     Text("No se han subido archivos.")
                         .foregroundColor(.gray)
                 } else {
-                    ForEach(archivosAdjuntos, id: \.self) { archivo in
-                        Text("📎 \(archivo)")
+                    ForEach(archivosAdjuntos.indices, id: \.self) { index in
+                        if let uiImage = UIImage(data: archivosAdjuntos[index]) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 100)
+                                .cornerRadius(8)
+                        }
                     }
                 }
             }
@@ -177,10 +171,20 @@ struct ReportView: View {
                     .disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))
                     
                     PhotosPicker(selection: $photoPickerItem, matching: .images) {
-                                        Label("Rollo", systemImage: "photo.on.rectangle")
-                                            .frame(maxWidth: .infinity)
-                                    }
-                                    .buttonStyle(.bordered)
+                        Label("Rollo", systemImage: "photo.on.rectangle")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .onChange(of: photoPickerItem) { newItem in
+                        Task{
+                            if let data = try? await newItem?.loadTransferable(type: Data.self) {
+                                if archivosAdjuntos.count < 5 {
+                                    archivosAdjuntos.append(data)
+                                }
+                            }
+                        }
+                    }
+                    
 
                 }
             }
@@ -203,26 +207,7 @@ struct ReportView: View {
             Section {
                 Button(action: {
                     Task{
-                        do{
-                            let controller = IncidentsController(incidensClient: IncidentsClient())
-                            let response = try await controller.createIncident(
-                                titulo: titulo,
-                                id_categoria: selectedCategoryId ?? 0,
-                                nombre_atacante: atacante.isEmpty ? nil : atacante,
-                                telefono: contactos.first(where: { $0.tipo == "Teléfono"})?.valor,
-                                correo: contactos.first(where: { $0.tipo == "Correo"})?.valor,
-                                user: contactos.first(where: { $0.tipo == "Red Social"})?.valor,
-                                red_social: contactos.first(where: { $0.tipo == "Red Social"})?.redSocial,
-                                descripcion: descripcion,
-                                id_usuario: currentUserId ?? 0,
-                                supervisor: nil,
-                                es_anonimo: es_anonimo
-                            )
-                            print("Incidente creado con exito", response)
-                            showSuccessAlert = true
-                        } catch {
-                            print("Error al crear incidente", error)
-                        }
+                        await enviarReporte()
                     }
                 }) {
                     Text("Enviar reporte")
@@ -261,6 +246,49 @@ struct ReportView: View {
             }
         }
     }
+    
+    // MARK: - Envío del reporte
+    func enviarReporte() async {
+        do {
+            guard let currentUserId = currentUserId else {
+                print("❌ No hay usuario autenticado")
+                return
+            }
+            
+            let incidentsController = IncidentsController(incidensClient: IncidentsClient())
+
+            let response = try await incidentsController.createIncident(
+                titulo: titulo,
+                id_categoria: selectedCategoryId ?? 0,
+                nombre_atacante: atacante.isEmpty ? nil : atacante,
+                telefono: contactos.first(where: { $0.tipo == "Teléfono"})?.valor,
+                correo: contactos.first(where: { $0.tipo == "Correo"})?.valor,
+                user: contactos.first(where: { $0.tipo == "Red Social"})?.valor,
+                red_social: contactos.first(where: { $0.tipo == "Red Social"})?.redSocial,
+                descripcion: descripcion,
+                id_usuario: currentUserId,
+                supervisor: nil,
+                es_anonimo: es_anonimo,
+                evidences: archivosAdjuntos
+            )
+
+
+            print("✅ Incidente creado con éxito:", response)
+            await MainActor.run {
+                showSuccessAlert = true
+            }
+
+
+        } catch {
+            print("⚠️ Error al crear incidente:", error)
+            showSuccessAlert = false
+        }
+    }
+
+
+
+
+
 }
 
 
