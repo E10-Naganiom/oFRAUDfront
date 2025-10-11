@@ -5,6 +5,7 @@
 //  Created by Usuario on 17/09/25.
 //
  import Foundation
+import SwiftUICore
 
 struct Incident: Identifiable, Decodable {
         let id: Int
@@ -48,5 +49,34 @@ struct IncidentFormResponse: Codable, Identifiable {
         case descripcion, fecha_creacion, fecha_actualizacion
         case id_usuario, supervisor
         case id_estatus, es_anonimo
+    }
+}
+
+func formatISODate(_ isoDateString: String) -> String {
+    let isoFormatter = ISO8601DateFormatter()
+    isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+
+    if let date = isoFormatter.date(from: isoDateString) {
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateFormat = "dd/MM/yyyy" // 👈 formato final
+        displayFormatter.timeZone = .current       // convierte a zona local
+        displayFormatter.locale = Locale(identifier: "es_MX")
+        return displayFormatter.string(from: date)
+    } else {
+        return isoDateString // fallback
+    }
+}
+
+func getColorStatus(_ id_estatus: Int) -> Color {
+    switch id_estatus {
+    case 1:
+        return Color.yellow
+    case 2:
+        return Color.green
+    case 3:
+        return Color.red
+    default:
+        return Color.blue
     }
 }

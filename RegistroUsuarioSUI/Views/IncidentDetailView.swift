@@ -61,8 +61,8 @@ struct IncidentDetailView: View {
                                 .font(.subheadline.bold())
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 4)
-                                .background(Color.green.opacity(0.2))
-                                .foregroundColor(.orange)
+                                .background(getColorStatus(incidente.id_estatus).opacity(0.15))
+                                .foregroundColor(getColorStatus(incidente.id_estatus))
                                 .cornerRadius(12)
                     }
                     
@@ -71,7 +71,7 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text(incidente.fecha_creacion)
+                        Text(formatISODate(incidente.fecha_creacion))
                             .font(.subheadline)
                     }
                     
@@ -80,7 +80,7 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text(incidente.fecha_actualizacion)
+                        Text(formatISODate(incidente.fecha_actualizacion))
                             .font(.subheadline)
                     }
                 }
@@ -128,52 +128,64 @@ struct IncidentDetailView: View {
                 //}
                 
 
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 12) {
                     Text("Medios de contacto")
                         .font(.headline)
-                    //ForEach(incident.attachments, id: \.self) { file in
-                        HStack {
-                            Image(systemName: "phone")
-                                .foregroundColor(.blue)
-                            Text("Telefono")
-                                .foregroundColor(.blue)
-                            Spacer()
-                            Image(systemName: "arrow.down.circle.fill")
-                                .foregroundColor(.blue)
+                        .padding(.bottom, 4)
+                    
+                    // Teléfono
+                    HStack(spacing: 12) {
+                        Image(systemName: "phone.fill")
+                            .foregroundColor(.green)
+                            .font(.title3)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Teléfono")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text((incidente.telefono ?? "").isEmpty ? "No proporcionado" : incidente.telefono!)
+                                .font(.subheadline.bold())
                         }
-                        .padding(8)
-                        .background(Color(.systemGray5))
-                        .cornerRadius(8)
-                    HStack {
-                        Image(systemName: "envelope")
-                            .foregroundColor(.blue)
-                        Text("E-mail")
-                            .foregroundColor(.blue)
                         Spacer()
-                        Image(systemName: "arrow.down.circle.fill")
-                            .foregroundColor(.blue)
                     }
-                    .padding(8)
-                    .background(Color(.systemGray5))
-                    .cornerRadius(8)
-                    HStack {
-                        Image(systemName: "at")
-                            .foregroundColor(.blue)
-                        Text("Red social")
-                            .foregroundColor(.blue)
+                    
+                    // Correo
+                    HStack(spacing: 12) {
+                        Image(systemName: "envelope.fill")
+                            .foregroundColor(.red)
+                            .font(.title3)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Correo electrónico")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text((incidente.correo ?? "").isEmpty ? "No proporcionado" : incidente.correo!)
+                                .font(.subheadline.bold())
+                        }
                         Spacer()
-                        Image(systemName: "arrow.down.circle.fill")
-                            .foregroundColor(.blue)
                     }
-                    .padding(8)
-                    .background(Color(.systemGray5))
-                    .cornerRadius(8)
-                    //}
+                    
+                    // Red social
+                    HStack(spacing: 12) {
+                        Image(systemName: "person.crop.circle.fill")
+                            .foregroundColor(.blue)
+                            .font(.title3)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Usuario en red social")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text((incidente.user_red ?? "").isEmpty ? "No proporcionado" : incidente.user_red!)
+                                .font(.subheadline.bold())
+                            Text((incidente.red_social ?? "").isEmpty ? "No proporcionado" : incidente.red_social!)
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                    }
                 }
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(16)
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+
             }
             .padding()
         }

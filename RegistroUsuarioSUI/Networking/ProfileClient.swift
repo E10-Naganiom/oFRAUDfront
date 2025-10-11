@@ -9,7 +9,7 @@ import Foundation
 
 class ProfileClient {
     func getUserProfile(token:String) async throws -> UserProfileResponse {
-        guard let url = URL(string: "http://10.48.239.74:3000/auth/profile") else {
+        guard let url = URL(string: "http://10.48.238.32:3000/auth/profile") else {
             fatalError("Invalid URL" + "http://10.48.237.37:3000/auth/profile")
         }
         var urlRequest = URLRequest(url: url)
@@ -20,7 +20,7 @@ class ProfileClient {
     }
     
     func updateUserProfile(id: Int, nombre: String, apellido: String, email: String, contrasena: String, token: String) async throws {
-            guard let url = URL(string: "http://10.48.239.74:3000/users/\(id)") else {
+            guard let url = URL(string: "http://10.48.238.32:3000/users/\(id)") else {
                 fatalError("Invalid URL")
             }
             var urlRequest = URLRequest(url: url)

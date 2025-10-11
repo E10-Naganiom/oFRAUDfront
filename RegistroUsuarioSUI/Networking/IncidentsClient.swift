@@ -30,7 +30,7 @@ struct IncidentsClient {
     }
     
     func GetHistorial(id: Int) async throws -> [IncidentFormResponse] {
-        let url = URL(string: "http://10.48.239.74:3000/incidents/user/\(id)")!
+        let url = URL(string: "http://10.48.238.32:3000/incidents/user/\(id)")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -40,7 +40,7 @@ struct IncidentsClient {
     }
     
     func GetEstatus(id: Int) async throws -> String {
-        let url = URL(string: "http://10.48.239.74:3000/incidents/\(id)/status")!
+        let url = URL(string: "http://10.48.238.32:3000/incidents/\(id)/status")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -50,7 +50,7 @@ struct IncidentsClient {
     }
     
     func GetUsuario(id: Int) async throws -> String {
-        let url = URL(string: "http://10.48.239.74:3000/incidents/\(id)/username")!
+        let url = URL(string: "http://10.48.238.32:3000/incidents/\(id)/username")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")

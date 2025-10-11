@@ -38,21 +38,21 @@ struct IncidentCardView: View {
                     .font(.caption)
                     .padding(.vertical, 4)
                     .padding(.horizontal, 8)
-                    .background(Color.green.opacity(0.15))
-                    .foregroundColor(.green)
+                    .background(getColorStatus(incident.id_estatus).opacity(0.15))
+                    .foregroundColor(getColorStatus(incident.id_estatus))
                     .cornerRadius(8)
             }
             
             // Fechas y usuario
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
-                    Label(incident.fecha_creacion, systemImage: "calendar")
+                    Label("Creacion: \(formatISODate(incident.fecha_creacion))", systemImage: "calendar")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     
                     Spacer()
                     
-                    Label("Últ. act: \(incident.fecha_actualizacion)", systemImage: "clock")
+                    Label("Últ. act: \(formatISODate(incident.fecha_actualizacion))", systemImage: "clock")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -119,6 +119,12 @@ struct IncidentCardView: View {
             estatus = "Desconocido"
         }
     }
+
+
+
+    
+
+
 }
 
 //#Preview {
