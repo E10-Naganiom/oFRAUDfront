@@ -9,7 +9,7 @@ import Foundation
 
 struct CategoriesClient {
     func GetAllCategories() async throws -> [CategoryFormResponse] {
-        let url = URL(string: "http://10.48.238.32:3000/categories")!
+        let url = URL(string: "\(APIConfig.baseURL)/categories")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -19,7 +19,7 @@ struct CategoriesClient {
     }
     
     func GetNivelRiesgo(id: Int) async throws -> String {
-        let url = URL(string: "http://10.48.238.32:3000/categories/\(id)/risk-level")!
+        let url = URL(string: "\(APIConfig.baseURL)/categories/\(id)/risk-level")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")

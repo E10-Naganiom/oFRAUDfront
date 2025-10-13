@@ -1,10 +1,3 @@
-//
-//  DashboardView.swift
-//  RegistroUsuarioSUI
-//
-//  Created by Usuario on 23/09/25.
-//
-
 import SwiftUI
 import Charts // para las gráficas
 
@@ -28,6 +21,22 @@ struct DashboardView: View {
         ("Mes Actual", 4180)
     ]
     
+    // Array de consejos de seguridad
+    let securityTips = [
+        "Nunca hagas clic en enlaces sospechosos recibidos por correo electrónico.",
+        "Usa contraseñas únicas y cámbialas regularmente.",
+        "Evita conectarte a redes Wi-Fi públicas sin una VPN.",
+        "Verifica siempre la dirección del remitente antes de abrir un correo.",
+        "Mantén tu software y antivirus actualizados.",
+        "No compartas información personal en redes sociales.",
+        "Activa la autenticación de dos factores siempre que sea posible.",
+        "Revisa las URLs antes de iniciar sesión, especialmente si llegaron desde un enlace.",
+        "No compartas códigos de verificación o contraseñas, ni siquiera con supuestos agentes de soporte.",
+        "Configura alertas en tus cuentas bancarias para detectar movimientos sospechosos rápidamente."
+    ]
+    
+    @State private var currentTip = ""
+    
     var totalSessions: Int {
         trafficSources.reduce(0) { $0 + $1.1 }
     }
@@ -37,7 +46,7 @@ struct DashboardView: View {
     
     var body: some View {
         ZStack {
-            // Add proper background that adapts to dark/light mode
+            // Fondo adaptable al modo oscuro/claro
             Color(.systemBackground)
                 .ignoresSafeArea()
             
@@ -56,6 +65,12 @@ struct DashboardView: View {
             floatingActionButton
         }
         .navigationTitle("Dashboard")
+        .onAppear {
+            // Selecciona un consejo aleatorio al aparecer la vista
+            if let randomTip = securityTips.randomElement() {
+                currentTip = randomTip
+            }
+        }
     }
     
     // MARK: - View Components
@@ -66,7 +81,7 @@ struct DashboardView: View {
                 .font(.title.bold())
                 .padding(.top)
             
-            Text("Mantente protegido con las ultimas actualizaciones de seguridad")
+            Text("Mantente protegido con las últimas actualizaciones de seguridad")
                 .font(.headline)
         }
     }
@@ -81,7 +96,7 @@ struct DashboardView: View {
             
             HStack {
                 Image(systemName: "magnifyingglass")
-                Text("Filtrar por categoria")
+                Text("Filtrar por categoría")
                 
                 Picker("Filtrar por tipo", selection: $selectedFilter) {
                     ForEach(filtros, id: \.self) { tipo in
@@ -131,7 +146,6 @@ struct DashboardView: View {
             }
             
             HStack(spacing: 20) {
-                // Pie Chart
                 Chart(trafficSources, id: \.0) { source in
                     SectorMark(
                         angle: .value("Count", source.1),
@@ -142,7 +156,6 @@ struct DashboardView: View {
                 }
                 .frame(width: 120, height: 120)
                 
-                // Legend
                 pieChartLegend
             }
         }
@@ -203,21 +216,16 @@ struct DashboardView: View {
                     .foregroundColor(.secondary)
             }
             
-            // Bar Chart
             Chart(visitData, id: \.0) { data in
                 BarMark(
-                    x: .value("Period", data.0),
-                    y: .value("Visits", data.1)
+                    x: .value("Periodo", data.0),
+                    y: .value("Visitas", data.1)
                 )
-                .foregroundStyle(data.0 == "Actual" ? Color.green : Color.blue)
+                .foregroundStyle(data.0 == "Mes Actual" ? Color.green : Color.blue)
                 .cornerRadius(4)
             }
             .frame(height: 150)
-            .chartXAxis {
-                AxisMarks { _ in
-                    // Hide X axis labels
-                }
-            }
+            .chartXAxis(.hidden)
             .chartYAxis(.hidden)
             
             barChartStats
@@ -236,7 +244,6 @@ struct DashboardView: View {
                 
                 Text("\(previousVisits.formatted())")
                     .font(.headline.bold())
-                    .foregroundColor(.primary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
@@ -251,7 +258,6 @@ struct DashboardView: View {
                 
                 Text("\(currentVisits.formatted())")
                     .font(.headline.bold())
-                    .foregroundColor(.primary)
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
         }
@@ -277,12 +283,6 @@ struct DashboardView: View {
                 }
                 .padding(.horizontal)
             }
-            
-            VStack {
-//                IncidentCardView()
-//                IncidentCardView()
-//                IncidentCardView()
-            }
         }
     }
     
@@ -293,10 +293,11 @@ struct DashboardView: View {
                 Text("Consejo de seguridad")
                     .font(.title3.bold())
             }
-            Text("Nunca hagas clic en enlaces sospechosos recibidos por correo electrónico.")
+            Text(currentTip)
                 .foregroundColor(.green)
         }
         .padding()
+        .frame(maxWidth: .infinity)
         .background(.green.opacity(0.2))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
@@ -316,14 +317,12 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Conocer Nuestra Organización")
                         .font(.headline)
-                        .foregroundColor(.primary)
                     Text("Información sobre Red por la Ciberseguridad")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
                 
                 Spacer()
-                
                 Image(systemName: "chevron.right")
                     .foregroundColor(.secondary)
             }

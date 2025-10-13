@@ -36,6 +36,9 @@ struct CategoryDetailView: View {
                         }
                     }
                     .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(16)
                     
                     // Secciones dinámicas desde backend
                     if let senales = category.senales {
@@ -51,7 +54,8 @@ struct CategoryDetailView: View {
                         ExpandableTextSection(title: "Ejemplos Comunes", content: ejemplos)
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.vertical, 20)
             }
             .navigationTitle(category.titulo)
             .navigationBarTitleDisplayMode(.inline)
@@ -70,21 +74,25 @@ struct ExpandableTextSection: View {
     @State private var expanded = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(spacing: 0) {
+            // Botón header
             Button(action: { expanded.toggle() }) {
                 HStack {
-                    Text(title).font(.headline)
+                    Text(title)
+                        .font(.headline)
+                        .foregroundColor(.green)
                     Spacer()
                     Image(systemName: expanded ? "chevron.up" : "chevron.down")
+                        .foregroundColor(.green)
                 }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(.systemGray6))
             }
-            .padding().foregroundColor(.green)
-            .background(Color(.systemGray6))
-            .cornerRadius(12)
             
+            // Contenido expandible (pegado al header)
             if expanded {
-                // NUEVO: Bulletpoints en lugar de texto plano
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 12) {
                     ForEach(getBulletPoints(), id: \.self) { point in
                         HStack(alignment: .top, spacing: 8) {
                             Text("•")
@@ -94,16 +102,17 @@ struct ExpandableTextSection: View {
                                 .font(.subheadline)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
                 .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color(.systemGray5))
-                .cornerRadius(12)
             }
         }
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
     
-    // NUEVO: Función para dividir el texto en bulletpoints
     private func getBulletPoints() -> [String] {
         let sentences = content
             .components(separatedBy: ". ")

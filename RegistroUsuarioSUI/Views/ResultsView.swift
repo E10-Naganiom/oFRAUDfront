@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct ResultsView: View {
-    @State private var incidents: [Incident] = []
+    @State private var incidents: [IncidentFormResponse] = []
     @State private var isLoading = true
     @State private var searchText: String = ""
     @State private var selectedStatus: String = "Todos los estatus"
