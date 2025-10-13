@@ -18,4 +18,8 @@ struct CategoriesController {
         return try await categoriesClient.GetNivelRiesgo(id: id)
     }
     
+    func getNumRep(id:Int) async throws -> Int {
+        return try await categoriesClient.GetStatsCats(id: id)
+    }
+    
 }

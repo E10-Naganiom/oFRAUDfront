@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CategoryDetailView: View {
     let category: CategoryFormResponse
+    let risk: String
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -26,12 +27,12 @@ struct CategoryDetailView: View {
                         }
                         
                         HStack {
-                            Text("Riesgo: \(category.id_riesgo)")
-                                .font(.caption.bold())
-                                .foregroundColor(.red)
+                            Text("Riesgo: \(risk)")
+                                .font(.headline.bold())
+                                .foregroundColor(mapRiskToColor(category.id_riesgo))
+                                
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .background(Color.red.opacity(0.2))
                                 .cornerRadius(8)
                         }
                     }
@@ -120,5 +121,15 @@ struct ExpandableTextSection: View {
             .filter { !$0.isEmpty }
         
         return sentences
+    }
+}
+
+func mapRiskToColor(_ id_riesgo: Int) -> Color {
+    switch id_riesgo {
+    case 1: return .green
+    case 2: return .yellow
+    case 3: return .orange
+    case 4: return .red
+    default: return .gray
     }
 }

@@ -8,6 +8,10 @@ struct GuidesView: View {
     // Diccionario para íconos fijos por categoría
     @State private var categoryIcons: [Int: String] = [:]
     
+    @State private var riskDescriptions: [Int: String] = [:]
+    
+    @State private var contadores: [Int: Int] = [:]
+    
     // Lista de íconos posibles
     private let icons = [
         "lock.fill", "shield.fill", "exclamationmark.triangle.fill",
@@ -43,16 +47,18 @@ struct GuidesView: View {
                     } else {
                         ForEach(categories, id: \.id) { category in
                             CategoryCardView(
+                                id: category.id,
                                 icon: categoryIcons[category.id] ?? randomIcon(for: category),
                                 title: category.titulo,
                                 description: category.descripcion,
-                                severity: mapRiskToSeverity(category.id_riesgo),
+                                severity: category.id_riesgo,
                                 severityColor: mapRiskToColor(category.id_riesgo),
-                                reports: "0",
+                                reports: contadores[category.id] ?? 0,
                                 trending: false,
                                 onTapMore: {
                                     selectedCategory = category
-                                }
+                                },
+                                riesgo: riskDescriptions[category.id] ?? "N/A"
                             )
                         }
                     }
@@ -62,7 +68,7 @@ struct GuidesView: View {
         }
         .navigationTitle("Guías")
         .sheet(item: $selectedCategory) { category in
-            CategoryDetailView(category: category)
+            CategoryDetailView(category: category, risk: riskDescriptions[category.id] ?? "N/A")
         }
         .task {
             await loadCategories()
@@ -79,30 +85,30 @@ struct GuidesView: View {
                 if categoryIcons[category.id] == nil {
                     categoryIcons[category.id] = icons.randomElement() ?? "shield.fill"
                 }
+                if riskDescriptions[category.id] == nil {
+                    let rd = try await controller.getNivelRiesgo(id: category.id)
+                    riskDescriptions[category.id] = rd
+                }
+                if contadores[category.id] == nil {
+                    let c = try await controller.getNumRep(id: category.id)
+                    contadores[category.id] = c
+                }
             }
         } catch {
             print("Error cargando categorías:", error)
         }
         isLoading = false
     }
+
     
     private func randomIcon(for category: CategoryFormResponse) -> String {
         let newIcon = icons.randomElement() ?? "shield.fill"
         categoryIcons[category.id] = newIcon
         return newIcon
     }
+
     
-    private func mapRiskToSeverity(_ id_riesgo: Int) -> String {
-        switch id_riesgo {
-        case 1: return "Bajo"
-        case 2: return "Medio"
-        case 3: return "Alto"
-        case 4: return "Crítico"
-        default: return "Desconocido"
-        }
-    }
-    
-    private func mapRiskToColor(_ id_riesgo: Int) -> Color {
+    func mapRiskToColor(_ id_riesgo: Int) -> Color {
         switch id_riesgo {
         case 1: return .green
         case 2: return .yellow

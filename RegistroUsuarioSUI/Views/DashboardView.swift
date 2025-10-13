@@ -4,6 +4,10 @@ import Charts // para las gráficas
 struct DashboardView: View {
     @State private var searchText = ""
     @State private var selectedFilter = "Todas"
+    @State private var loadingFeed = true
+    
+    @State private var latestIncidents: [IncidentFormResponse] = []
+    @State private var categories: [CategoryFormResponse] = []
     
     let filtros = ["Todas", "Phishing", "Malware", "Ransomware", "Fraude"]
     
@@ -71,6 +75,23 @@ struct DashboardView: View {
                 currentTip = randomTip
             }
         }
+        .task {
+            await getFeed()
+        }
+    }
+    
+    private func getFeed() async {
+        loadingFeed = true
+        defer { loadingFeed = false }
+        let controller = IncidentsController(incidensClient: IncidentsClient())
+        let categoriesController = CategoriesController(categoriesClient: CategoriesClient())
+        do {
+            latestIncidents = try await controller.getFeed()
+            categories = try await categoriesController.getAllCategories()
+        }
+        catch {
+            print("No se pudo obtener el feed ni categorias de los incidentes: \(error)")
+        }
     }
     
     // MARK: - View Components
@@ -98,13 +119,23 @@ struct DashboardView: View {
                 Image(systemName: "magnifyingglass")
                 Text("Filtrar por categoría")
                 
-                Picker("Filtrar por tipo", selection: $selectedFilter) {
-                    ForEach(filtros, id: \.self) { tipo in
-                        Text(tipo)
+//                Picker("Filtrar por tipo", selection: $selectedFilter) {
+//                    ForEach(filtros, id: \.self) { tipo in
+//                        Text(tipo)
+//                    }
+//                }
+                
+                if loadingFeed {
+                    ProgressView("Cargando categorias ...")
+                } else {
+                    Picker("Categoria", selection: $selectedFilter){
+                        ForEach(categories, id: \.id) { cat in
+                            Text(cat.titulo).tag(Optional(cat.id))
+                        }
                     }
+                    .pickerStyle(MenuPickerStyle())
+                    .padding(.horizontal)
                 }
-                .pickerStyle(MenuPickerStyle())
-                .padding(.horizontal)
                 
                 NavigationLink(destination: ResultsView()) {
                     Text("Buscar")
@@ -131,7 +162,7 @@ struct DashboardView: View {
             HStack {
                 Image(systemName: "network")
                     .foregroundColor(.orange)
-                Text("Incidentes más comunes")
+                Text("Incidentes clasificados por estatus")
                     .font(.title2.bold())
             }
             
@@ -269,10 +300,7 @@ struct DashboardView: View {
             HStack {
                 Text("Actividad reciente")
                     .font(.title2.bold())
-                    .padding(.top)
-                
                 Spacer()
-                
                 NavigationLink(destination: ResultsView()) {
                     Text("Ver todo")
                         .padding(.horizontal, 12)
@@ -281,9 +309,32 @@ struct DashboardView: View {
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
-                .padding(.horizontal)
             }
+            .padding(.horizontal)
+
+
+            VStack(spacing: 16) {
+                if loadingFeed {
+                    ProgressView("Cargando feed")
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                } else if latestIncidents.isEmpty {
+                    Text("No hay feed reciente")
+                        .foregroundColor(.secondary)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                } else {
+                    ForEach(latestIncidents) { incident in
+                        IncidentCardView(incident: incident, categories: categories)
+                            .padding()
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                    }
+                }
+            }
+            .padding(.horizontal)
         }
+        .padding(.vertical)
     }
     
     private var securityTipSection: some View {

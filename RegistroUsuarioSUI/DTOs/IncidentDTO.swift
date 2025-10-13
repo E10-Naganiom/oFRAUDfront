@@ -20,7 +20,6 @@ struct IncidentFormRequest: Codable {
     var id_usuario: Int
     var supervisor: Int?
     var es_anonimo: Bool
-    
 }
 
 struct IncidentFormResponse: Codable, Identifiable {
@@ -33,7 +32,7 @@ struct IncidentFormResponse: Codable, Identifiable {
     let supervisor: Int?
     let id_estatus: Int
     let es_anonimo: Bool
-    let files: [Evidence]?
+    let evidencias: [Evidence]?
     
     enum CodingKeys: String, CodingKey {
         case id, titulo, id_categoria
@@ -42,7 +41,7 @@ struct IncidentFormResponse: Codable, Identifiable {
         case descripcion, fecha_creacion, fecha_actualizacion
         case id_usuario, supervisor
         case id_estatus, es_anonimo
-        case files
+        case evidencias
     }
 }
 

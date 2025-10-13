@@ -290,7 +290,7 @@ struct IncidentDetailView: View {
                 }
                 
                 // Evidencias (no editables por ahora)
-                if let evidencias = incidente.files, !evidencias.isEmpty {
+                if let evidencias = incidente.evidencias, !evidencias.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Evidencias")
                             .font(.headline)

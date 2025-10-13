@@ -5,9 +5,12 @@
 //  Created by Usuario on 23/09/25.
 //
 
+
 import SwiftUI
 import PhotosUI
 import UIKit
+
+
 
 
 struct ReportView: View {
@@ -25,6 +28,7 @@ struct ReportView: View {
     
     @State private var contactos: [MetodoContacto] = []
     @State private var descripcion = ""
+
 
     @State private var showSuccessAlert = false
     @State private var navigateToDashboard = false
@@ -186,6 +190,7 @@ struct ReportView: View {
                     }
                     
 
+
                 }
             }
             
@@ -257,6 +262,7 @@ struct ReportView: View {
             
             let incidentsController = IncidentsController(incidensClient: IncidentsClient())
 
+
             let response = try await incidentsController.createIncident(
                 titulo: titulo,
                 id_categoria: selectedCategoryId ?? 0,
@@ -273,10 +279,14 @@ struct ReportView: View {
             )
 
 
+
+
             print("✅ Incidente creado con éxito:", response)
             await MainActor.run {
                 showSuccessAlert = true
             }
+
+
 
 
         } catch {
@@ -289,7 +299,14 @@ struct ReportView: View {
 
 
 
+
+
+
+
+
 }
+
+
 
 
 // MARK: - Modelo de método de contacto
@@ -301,8 +318,13 @@ struct MetodoContacto: Identifiable {
 }
 
 
+
+
 #Preview {
     NavigationStack {
         ReportView()
     }
 }
+
+
+
