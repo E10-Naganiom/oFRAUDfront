@@ -46,7 +46,7 @@ struct ReportView: View {
         self.categoriesController = CategoriesController(categoriesClient: CategoriesClient())
     }
     
-    let redesSociales = ["Twitter/X", "Facebook", "Instagram", "LinkedIn", "Otro"]
+    let redesSociales = ["Twitter/X", "Facebook", "Instagram", "LinkedIn", "TikTok", "Otro"]
     
     var body: some View {
         Form {
@@ -262,7 +262,6 @@ struct ReportView: View {
             
             let incidentsController = IncidentsController(incidensClient: IncidentsClient())
 
-
             let response = try await incidentsController.createIncident(
                 titulo: titulo,
                 id_categoria: selectedCategoryId ?? 0,
@@ -278,20 +277,14 @@ struct ReportView: View {
                 evidences: archivosAdjuntos
             )
 
-
-
-
-            print("✅ Incidente creado con éxito:", response)
+            print("✅ Respuesta completa:", response)
             await MainActor.run {
                 showSuccessAlert = true
             }
 
-
-
-
         } catch {
-            print("⚠️ Error al crear incidente:", error)
-            showSuccessAlert = false
+            print("⚠️ Error completo:", error)
+            print("⚠️ Descripción:", error.localizedDescription)
         }
     }
 

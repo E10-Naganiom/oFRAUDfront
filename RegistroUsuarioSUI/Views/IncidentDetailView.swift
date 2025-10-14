@@ -297,7 +297,9 @@ struct IncidentDetailView: View {
                         
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 10)], spacing: 10) {
                             ForEach(evidencias) { evidencia in
-                                if let url = URL(string: evidencia.url),
+                                let fullURL = URL(string: "\(APIConfig.baseURL)/\(evidencia.url)")
+                                
+                                if let url = fullURL,
                                    evidencia.url.lowercased().hasSuffix(".jpg") ||
                                    evidencia.url.lowercased().hasSuffix(".jpeg") ||
                                    evidencia.url.lowercased().hasSuffix(".png") {

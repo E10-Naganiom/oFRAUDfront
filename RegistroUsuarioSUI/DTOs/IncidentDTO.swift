@@ -25,23 +25,76 @@ struct IncidentFormRequest: Codable {
 struct IncidentFormResponse: Codable, Identifiable {
     let id: Int
     let titulo: String
-    let id_categoria: Int
-    let nombre_atacante, telefono, correo, user_red, red_social: String?
-    let descripcion, fecha_creacion, fecha_actualizacion: String
+    let id_categoria: Int  // Esto espera Int
+    let nombre_atacante: String?
+    let telefono: String?
+    let correo: String?
+    let user_red: String?
+    let red_social: String?
+    let descripcion: String
+    let fecha_creacion: String
+    let fecha_actualizacion: String
     let id_usuario: Int
-    let supervisor: Int?
     let id_estatus: Int
+    let supervisor: Int?
     let es_anonimo: Bool
     let evidencias: [Evidence]?
     
     enum CodingKeys: String, CodingKey {
-        case id, titulo, id_categoria
-        case nombre_atacante = "nombre_atacante"
-        case telefono, correo, user_red = "user_red", red_social = "red_social"
+        case id, titulo
+        case id_categoria = "id_categoria"
+        case nombre_atacante, telefono, correo
+        case user_red = "user_red"
+        case red_social = "red_social"
         case descripcion, fecha_creacion, fecha_actualizacion
-        case id_usuario, supervisor
-        case id_estatus, es_anonimo
-        case evidencias
+        case id_usuario = "id_usuario"
+        case id_estatus = "id_estatus"
+        case supervisor, es_anonimo, evidencias
+    }
+    
+    // Decodificación personalizada para manejar strings como números
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(Int.self, forKey: .id)
+        self.titulo = try container.decode(String.self, forKey: .titulo)
+        
+        // Decodificar id_categoria como Int o String convertido a Int
+        if let idCatInt = try? container.decode(Int.self, forKey: .id_categoria) {
+            self.id_categoria = idCatInt
+        } else {
+            let idCatStr = try container.decode(String.self, forKey: .id_categoria)
+            self.id_categoria = Int(idCatStr) ?? 0
+        }
+        
+        self.nombre_atacante = try container.decodeIfPresent(String.self, forKey: .nombre_atacante)
+        self.telefono = try container.decodeIfPresent(String.self, forKey: .telefono)
+        self.correo = try container.decodeIfPresent(String.self, forKey: .correo)
+        self.user_red = try container.decodeIfPresent(String.self, forKey: .user_red)
+        self.red_social = try container.decodeIfPresent(String.self, forKey: .red_social)
+        self.descripcion = try container.decode(String.self, forKey: .descripcion)
+        self.fecha_creacion = try container.decode(String.self, forKey: .fecha_creacion)
+        self.fecha_actualizacion = try container.decode(String.self, forKey: .fecha_actualizacion)
+        
+        // Decodificar id_usuario como Int o String
+        if let idUserInt = try? container.decode(Int.self, forKey: .id_usuario) {
+            self.id_usuario = idUserInt
+        } else {
+            let idUserStr = try container.decode(String.self, forKey: .id_usuario)
+            self.id_usuario = Int(idUserStr) ?? 0
+        }
+        
+        self.id_estatus = try container.decode(Int.self, forKey: .id_estatus)
+        self.supervisor = try container.decodeIfPresent(Int.self, forKey: .supervisor)
+        
+        // Decodificar es_anonimo como Bool o String
+        if let esBoolVal = try? container.decode(Bool.self, forKey: .es_anonimo) {
+            self.es_anonimo = esBoolVal
+        } else {
+            let esStr = try container.decode(String.self, forKey: .es_anonimo)
+            self.es_anonimo = esStr.lowercased() == "true"
+        }
+        
+        self.evidencias = try container.decodeIfPresent([Evidence].self, forKey: .evidencias)
     }
 }
 
