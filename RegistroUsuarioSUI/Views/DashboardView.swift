@@ -8,6 +8,7 @@ struct DashboardView: View {
     
     @State private var latestIncidents: [IncidentFormResponse] = []
     @State private var categories: [CategoryFormResponse] = []
+    @State private var datosGraficas: StatsResponse = StatsResponse(total_incidentes: 0, total_categorias: 0, por_estatus: [], por_categoria: [], metodos_contacto: [], redes_sociales: [])
     
     let filtros = ["Todas", "Phishing", "Malware", "Ransomware", "Fraude"]
     
@@ -77,6 +78,7 @@ struct DashboardView: View {
         }
         .task {
             await getFeed()
+            await getNumsGraficas()
         }
     }
     
@@ -86,11 +88,24 @@ struct DashboardView: View {
         let controller = IncidentsController(incidensClient: IncidentsClient())
         let categoriesController = CategoriesController(categoriesClient: CategoriesClient())
         do {
-            latestIncidents = try await controller.getFeed()
             categories = try await categoriesController.getAllCategories()
+            latestIncidents = try await controller.getFeed()
         }
         catch {
             print("No se pudo obtener el feed ni categorias de los incidentes: \(error)")
+        }
+    }
+    
+    private func getNumsGraficas() async {
+        loadingFeed = true
+        defer { loadingFeed = false }
+        let controller = IncidentsController(incidensClient: IncidentsClient())
+        do {
+            datosGraficas = try await controller.getEstadisticas()
+            print("Datos para graficas cargados exitosamente")
+        }
+        catch {
+            print("No se pudieron obtener las estadisticas: \(error)")
         }
     }
     
@@ -152,10 +167,39 @@ struct DashboardView: View {
     
     private var statisticsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            pieChartSection
-            barChartSection
+//            pieChartSection
+//            barChartSection
+            incidentesPorEstatusSection
         }
     }
+    
+    private var incidentesPorEstatusSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Image(systemName: "network")
+                    .foregroundColor(.orange)
+                Text("Incidentes clasificados por estatus")
+                    .font(.title2.bold())
+            }
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Text("\(datosGraficas.total_incidentes) Incidentes reportados al momento")
+                    .font(.largeTitle.bold())
+                    .foregroundColor(.primary)
+            }
+            HStack(spacing: 20) {
+                Chart(datosGraficas.por_estatus, id: \.estatus) { e in
+                    SectorMark(
+                        angle: .value("Porcentaje", e.porcentaje),
+                        innerRadius: .ratio(0.6)
+                    )
+                    .foregroundStyle(by: .value("Estatus", e.estatus))
+                }
+                .frame(height: 200)
+            }
+        }
+    }
+    
     
     private var pieChartSection: some View {
         VStack(alignment: .leading, spacing: 16) {

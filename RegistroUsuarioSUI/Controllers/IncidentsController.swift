@@ -30,4 +30,8 @@ struct IncidentsController {
         return try await incidensClient.GetFeed()
     }
     
+    func getEstadisticas() async throws -> StatsResponse {
+        return try await incidensClient.GetStats()
+    }
+    
 }

@@ -45,6 +45,68 @@ struct IncidentFormResponse: Codable, Identifiable {
     }
 }
 
+struct StatsResponse: Codable {
+    let total_incidentes: Int
+    let total_categorias: Int
+    let por_estatus: [IncidentesPorEstatus]
+    let por_categoria: [IncidentesPorCategoria]
+    let metodos_contacto: [IncidentesPorMetodoContacto]
+    let redes_sociales: [IncidentesPorRedesSociales]
+    
+    enum CodingKeys: String, CodingKey {
+        case total_incidentes, total_categorias
+        case por_estatus
+        case por_categoria
+        case metodos_contacto
+        case redes_sociales
+    }
+}
+struct IncidentesPorEstatus: Codable {
+    let estatus: String
+    let total: Int
+    let porcentaje: Double
+    
+    enum CodingKeys: String, CodingKey {
+        case estatus
+        case total
+        case porcentaje
+    }
+}
+struct IncidentesPorCategoria: Codable {
+    let titulo: String
+    let total: Int
+    let porcentaje: Double
+    
+    enum CodingKeys: String, CodingKey {
+        case titulo
+        case total
+        case porcentaje
+    }
+}
+struct IncidentesPorMetodoContacto : Codable {
+    let metodo: String
+    let total: Int
+    let porcentaje: Double
+    
+    enum CodingKeys: String, CodingKey {
+        case metodo
+        case total
+        case porcentaje
+    }
+}
+
+struct IncidentesPorRedesSociales : Codable {
+    let nombre: String
+    let total: Int
+    let porcentaje: Double
+    
+    enum CodingKeys: String, CodingKey {
+        case nombre
+        case total
+        case porcentaje
+    }
+}
+
 struct Evidence : Codable, Identifiable {
     let id: Int
     let id_incidente: Int
