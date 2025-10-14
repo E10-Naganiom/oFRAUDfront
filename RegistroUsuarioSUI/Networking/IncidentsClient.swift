@@ -1,10 +1,3 @@
-//
-//  IncidentsClient.swift
-//  RegistroUsuarioSUI
-//
-//  Created by Usuario on 30/09/25.
-//
-
 import Foundation
 
 struct IncidentsClient {
@@ -12,22 +5,82 @@ struct IncidentsClient {
     struct StatusResponse: Codable {
         let descripcion: String
     }
-    struct NameResonse: Codable {
+    
+    struct NameResponse: Codable {
         let nombreCompleto: String
     }
     
 
-    func CreateIncident(titulo: String, id_categoria: Int, nombre_atacante:String?, telefono:String?, correo:String?, user:String?, red_social:String?, descripcion:String, id_usuario:Int, supervisor:Int?, es_anonimo:Bool) async throws -> IncidentFormResponse {
-        let requestForm = IncidentFormRequest(titulo: titulo, id_categoria: id_categoria, nombre_atacante: nombre_atacante, telefono: telefono, correo: correo, user: user, red_social: red_social, descripcion: descripcion, id_usuario: id_usuario, supervisor: supervisor, es_anonimo: es_anonimo)
+    func CreateIncident(
+        titulo: String,
+        id_categoria: Int,
+        nombre_atacante: String?,
+        telefono: String?,
+        correo: String?,
+        user: String?,
+        red_social: String?,
+        descripcion: String,
+        id_usuario: Int,
+        supervisor: Int?,
+        es_anonimo: Bool,
+        evidences: [Data]?
+    ) async throws -> IncidentFormResponse {
         let url = URL(string: "\(APIConfig.baseURL)/incidents")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "POST"
-        httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        let jsonData = try JSONEncoder().encode(requestForm)
-        httpRequest.httpBody = jsonData
+        
+        let boundary = UUID().uuidString
+        httpRequest.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        var body = Data()
+        
+        // Agregar campos de texto
+        addFormField(&body, name: "titulo", value: titulo, boundary: boundary)
+        addFormField(&body, name: "id_categoria", value: String(id_categoria), boundary: boundary)
+        addFormField(&body, name: "nombre_atacante", value: nombre_atacante ?? "", boundary: boundary)
+        addFormField(&body, name: "telefono", value: telefono ?? "", boundary: boundary)
+        addFormField(&body, name: "correo", value: correo ?? "", boundary: boundary)
+        addFormField(&body, name: "user_red", value: user ?? "", boundary: boundary)
+        addFormField(&body, name: "red_social", value: red_social ?? "", boundary: boundary)
+        addFormField(&body, name: "descripcion", value: descripcion, boundary: boundary)
+        addFormField(&body, name: "id_usuario", value: String(id_usuario), boundary: boundary)
+        //addFormField(&body, name: "supervisor", value: String(supervisor ?? 0), boundary: boundary)
+        if let supervisor = supervisor {
+            addFormField(&body, name: "supervisor", value: String(supervisor), boundary: boundary)
+        }
+        addFormField(&body, name: "es_anonimo", value: es_anonimo ? "true" : "false", boundary: boundary)
+        
+        // Agregar archivos de fotos
+        if let evidences = evidences, !evidences.isEmpty {
+            for (index, imageData) in evidences.enumerated() {
+                addFormFile(&body, name: "files", filename: "image_\(index).jpg", data: imageData, boundary: boundary)
+            }
+        }
+        
+        // Cerrar boundary
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        
+        httpRequest.httpBody = body
         let (data, _) = try await URLSession.shared.data(for: httpRequest)
+        if let jsonString = String(data: data, encoding: .utf8){
+            print("JSON: ", jsonString)
+        }
         let response = try JSONDecoder().decode(IncidentFormResponse.self, from: data)
         return response
+    }
+    
+    private func addFormField(_ body: inout Data, name: String, value: String, boundary: String) {
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"\(name)\"\r\n\r\n".data(using: .utf8)!)
+        body.append("\(value)\r\n".data(using: .utf8)!)
+    }
+    
+    private func addFormFile(_ body: inout Data, name: String, filename: String, data: Data, boundary: String) {
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"\(name)\"; filename=\"\(filename)\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+        body.append(data)
+        body.append("\r\n".data(using: .utf8)!)
     }
     
     func GetHistorial(id: Int) async throws -> [IncidentFormResponse] {
@@ -56,7 +109,7 @@ struct IncidentsClient {
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         let (data, _) = try await URLSession.shared.data(for: httpRequest)
-        let response = try JSONDecoder().decode(NameResonse.self, from: data)
+        let response = try JSONDecoder().decode(NameResponse.self, from: data)
         return response.nombreCompleto
     }
     
