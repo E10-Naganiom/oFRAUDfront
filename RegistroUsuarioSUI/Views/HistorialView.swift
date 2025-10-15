@@ -18,6 +18,7 @@ struct HistorialView: View {
     @State private var searchText: String = ""
     @State private var selectedStatus: String = "Todos los estatus"
     @State private var categories: [CategoryFormResponse] = []
+    @State private var datosResumen: SummaryResponse = SummaryResponse(total_incidentes: 0, total_aprobados: 0, total_pendientes: 0, total_rechazados: 0)
     
     let statusOptions = ["Todos los estatus", "Aprobados", "Pendientes"]
     
@@ -75,8 +76,10 @@ struct HistorialView: View {
                 }
                 VStack(alignment: .leading, spacing: 5){
                     Text("Resumen").font(.headline)
-                    Text("Total de reportes: 123")
-                    Text("Aprobados: 2")
+                    Text("Total de reportes: \(datosResumen.total_incidentes)")
+                    Text("Aprobados: \(datosResumen.total_aprobados)")
+                    Text("Pendientes: \(datosResumen.total_pendientes)")
+                    Text("Rechazados: \(datosResumen.total_rechazados)")
                 }
                 .padding().frame(maxWidth: .infinity, alignment: .leading).background(Color(.green)).cornerRadius(10).padding()
             }
@@ -103,6 +106,8 @@ struct HistorialView: View {
             print("Cargado el historial del usuario")
             
             categories = try await categoriesController.getAllCategories()
+            
+            datosResumen = try await incidentesController.getSummaryUser(id: profile.id)
         }
         catch {
             print("No se pudo acceder al historial del usuario: ", error)

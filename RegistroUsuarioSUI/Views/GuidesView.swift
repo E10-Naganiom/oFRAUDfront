@@ -87,12 +87,10 @@ struct GuidesView: View {
                 }
                 if riskDescriptions[category.id] == nil {
                     let rd = try await controller.getNivelRiesgo(id: category.id)
-                    print("RD: " + rd)
                     riskDescriptions[category.id] = rd
                 }
                 if contadores[category.id] == nil {
                     let c = try await controller.getNumRep(id: category.id)
-                    print("C: \(c)")
                     contadores[category.id] = c
                 }
             }

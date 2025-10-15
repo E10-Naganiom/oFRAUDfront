@@ -114,6 +114,22 @@ struct StatsResponse: Codable {
         case redes_sociales
     }
 }
+
+struct SummaryResponse: Codable {
+    let total_incidentes: Int
+    let total_aprobados: Int
+    let total_pendientes: Int
+    let total_rechazados: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case total_incidentes
+        case total_aprobados
+        case total_pendientes
+        case total_rechazados
+    }
+}
+
+
 struct IncidentesPorEstatus: Codable {
     let estatus: String
     let total: Int

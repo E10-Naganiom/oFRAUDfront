@@ -9,7 +9,6 @@ struct IncidentsClient {
     struct NameResponse: Codable {
         let nombreCompleto: String
     }
-    
 
     func CreateIncident(
         titulo: String,
@@ -130,6 +129,16 @@ struct IncidentsClient {
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         let (data, _) = try await URLSession.shared.data(for: httpRequest)
         let response = try JSONDecoder().decode(StatsResponse.self, from: data)
+        return response
+    }
+    
+    func GetSummaryUser(id: Int) async throws -> SummaryResponse {
+        let url = URL(string: "\(APIConfig.baseURL)/incidents/user/\(id)/summary")!
+        var httpRequest = URLRequest(url: url)
+        httpRequest.httpMethod = "GET"
+        httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        let (data, _) = try await URLSession.shared.data(for: httpRequest)
+        let response = try JSONDecoder().decode(SummaryResponse.self, from: data)
         return response
     }
     

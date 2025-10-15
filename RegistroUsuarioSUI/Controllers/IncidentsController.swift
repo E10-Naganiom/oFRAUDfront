@@ -34,4 +34,7 @@ struct IncidentsController {
         return try await incidensClient.GetStats()
     }
     
+    func getSummaryUser(id: Int) async throws -> SummaryResponse {
+        return try await incidensClient.GetSummaryUser(id: id)
+    }
 }
