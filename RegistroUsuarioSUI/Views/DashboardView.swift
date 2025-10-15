@@ -354,8 +354,6 @@ struct DashboardView: View {
                         .cornerRadius(8)
                 }
             }
-            .padding(.horizontal)
-
 
             VStack(spacing: 16) {
                 if loadingFeed {
@@ -376,9 +374,7 @@ struct DashboardView: View {
                     }
                 }
             }
-            .padding(.horizontal)
-        }
-        .padding(.vertical)
+        }.frame(maxWidth: .infinity)
     }
     
     private var securityTipSection: some View {

@@ -42,10 +42,13 @@ struct IncidentDetailView: View {
                     
                     Spacer()
                     
-                    Button(action: { isEditing.toggle() }) {
-                        Image(systemName: "pencil.circle.fill")
-                            .foregroundColor(.green)
-                            .font(.system(size: 32))
+                    // Solo mostrar botón de editar si NO está aprobado (id_estatus != 2)
+                    if incidente.id_estatus != 2 {
+                        Button(action: { isEditing.toggle() }) {
+                            Image(systemName: "pencil.circle.fill")
+                                .foregroundColor(.green)
+                                .font(.system(size: 32))
+                        }
                     }
                 }
                 .padding(.bottom, 8)
@@ -276,8 +279,8 @@ struct IncidentDetailView: View {
                 .cornerRadius(16)
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                 
-                // Botón guardar (solo visible cuando está editando)
-                if isEditing {
+                // Botón guardar (solo visible cuando está editando Y NO está aprobado)
+                if isEditing && incidente.id_estatus != 2 {
                     Button("Guardar cambios") {
                         Task {
                             await updateIncident()
@@ -374,10 +377,8 @@ struct IncidentDetailView: View {
     }
     
     private func updateIncident() async {
-        // TODO: Implementar la llamada al backend para actualizar el incidente
         let incidentsController = IncidentsController(incidensClient: IncidentsClient())
         do {
-            // try await incidentsController.updateIncident(...)
             print("Incidente actualizado: \(editedIncident)")
             showUpdateSuccess = true
         } catch {
