@@ -10,11 +10,14 @@ import MapKit
 
 struct OrganizationView: View {
     @State private var position = MapCameraPosition.region(
-            MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: 19.2840617, longitude: -99.1361044),
-                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-            )
+        MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 19.2840617, longitude: -99.1361044),
+            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         )
+    )
+    
+    @State private var showPrivacyPolicy: Bool = false
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -56,7 +59,6 @@ struct OrganizationView: View {
                     
                     Text("Garantizar que todas las personas, especialmente las mujeres y niñas, puedan ejercer plenamente su capacidad humana derechos mediante el uso de la tecnología.")
                         .foregroundColor(.secondary)
-                    
                     
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -277,14 +279,14 @@ struct OrganizationView: View {
                         .padding()
                         .background(Color(.systemGray5))
                         .cornerRadius(8)
-                        }
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(16)
                 
-                // Initiatives
+                // Iniciativas
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
                         Image(systemName: "lightbulb.fill")
@@ -368,7 +370,7 @@ struct OrganizationView: View {
                 .background(Color.green.opacity(0.1))
                 .cornerRadius(16)
                 
-                // Legal info
+                // Información Legal
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Image(systemName: "doc.text.fill")
@@ -378,7 +380,7 @@ struct OrganizationView: View {
                     }
                     
                     Button("Política de Privacidad") {
-                        // politicas
+                        showPrivacyPolicy = true //
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -408,6 +410,11 @@ struct OrganizationView: View {
             .padding()
         }
         .navigationTitle("Sobre Nosotros")
+        // 👇 Presenta la misma vista de políticas
+        .sheet(isPresented: $showPrivacyPolicy) {
+            PrivacyPolicyView(isPresented: $showPrivacyPolicy)
+                .presentationDetents([.medium, .large])
+        }
     }
 }
 

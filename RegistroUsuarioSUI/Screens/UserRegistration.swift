@@ -15,6 +15,7 @@ struct UserRegistration: View {
     
     @State private var showSuccessMessage: Bool = false
     @State private var navigateToLogin: Bool = false
+    @State private var showPrivacyPolicy: Bool = false
     
     func register() async {
         do{
@@ -111,15 +112,15 @@ struct UserRegistration: View {
                             }
                             .buttonStyle(PlainButtonStyle())
                             
-                            (Text("Acepto los ") +
-                             Text("términos de servicio y políticas de privacidad")
-                                .foregroundColor(.green)
-                                .underline())
-                            .font(.footnote)
-                            .onTapGesture {
-                                // Only trigger on the green text area
-                                // TODO: Navigate to terms of service
-                                print("Navigate to terms of service")
+                            VStack(alignment: .leading, spacing: 4) {
+                                (Text("Acepto los ") +
+                                 Text("términos de servicio y políticas de privacidad")
+                                    .foregroundColor(.green)
+                                    .underline())
+                                .font(.footnote)
+                                .onTapGesture {
+                                    showPrivacyPolicy = true
+                                }
                             }
                         }
                         .padding(.vertical, 4)
@@ -169,6 +170,10 @@ struct UserRegistration: View {
         }
         .navigationDestination(isPresented: $navigateToLogin){
             LoginScreen()
+        }
+        .sheet(isPresented: $showPrivacyPolicy) {
+            PrivacyPolicyView(isPresented: $showPrivacyPolicy)
+                .presentationDetents([.medium, .large])
         }
         .alert("Registro exitoso", isPresented: $showSuccessMessage){
             Button("Aceptar", role: .cancel){

@@ -59,8 +59,8 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     headerSection
                     searchSection
-                    statisticsSection
                     recentActivitySection
+                    statisticsSection
                     securityTipSection
                     organizationSection
                 }
@@ -170,6 +170,9 @@ struct DashboardView: View {
 //            pieChartSection
 //            barChartSection
             incidentesPorEstatusSection
+            incidentesPorCategoriaSection
+            incidentesPorMetodoSection
+            incidentesPorRedesSection
         }
     }
     
@@ -183,7 +186,7 @@ struct DashboardView: View {
             }
             
             VStack(alignment: .leading, spacing: 8) {
-                Text("\(datosGraficas.total_incidentes) Incidentes reportados al momento")
+                Text("\(datosGraficas.total_incidentes) Categorias reportadas al momento")
                     .font(.largeTitle.bold())
                     .foregroundColor(.primary)
             }
@@ -199,6 +202,89 @@ struct DashboardView: View {
             }
         }
     }
+    
+    private var incidentesPorMetodoSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Image(systemName: "envelope")
+                    .foregroundColor(.orange)
+                Text("Incidentes clasificados por metodos de contacto")
+                    .font(.title2.bold())
+            }
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Text("\(datosGraficas.total_incidentes) Incidentes reportados al momento")
+                    .font(.largeTitle.bold())
+                    .foregroundColor(.primary)
+            }
+            HStack(spacing: 20) {
+                Chart(datosGraficas.metodos_contacto, id: \.metodo) { m in
+                    BarMark(
+                        x: .value("Porcentaje", Double(m.porcentaje) ?? 0),
+                        y: .value("Metodo", m.metodo)
+                    )
+                    .foregroundStyle(.green.gradient)
+                }
+                .frame(height: 150)
+            }
+        }
+    }
+    
+    private var incidentesPorCategoriaSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Image(systemName: "eye")
+                    .foregroundColor(.orange)
+                Text("Incidentes clasificados por categoria")
+                    .font(.title2.bold())
+            }
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Text("\(datosGraficas.total_categorias) Incidentes reportados al momento")
+                    .font(.largeTitle.bold())
+                    .foregroundColor(.primary)
+            }
+            HStack(spacing: 20) {
+                Chart(datosGraficas.por_categoria, id: \.titulo) { c in
+                    BarMark(
+                        x: .value("Categoria", c.titulo),
+                        y: .value("Porcentaje", Double(c.porcentaje) ?? 0)
+                    )
+                    .foregroundStyle(.blue.gradient)
+                }
+                .frame(height: 200)
+            }
+        }
+    }
+    
+    private var incidentesPorRedesSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Image(systemName: "eye")
+                    .foregroundColor(.orange)
+                Text("Incidentes clasificados por redes")
+                    .font(.title2.bold())
+            }
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Text("\(datosGraficas.total_categorias) Incidentes reportados al momento")
+                    .font(.largeTitle.bold())
+                    .foregroundColor(.primary)
+            }
+            HStack(spacing: 20) {
+                Chart(datosGraficas.redes_sociales, id: \.nombre) { r in
+                    BarMark(
+                        x: .value("Red Social", r.nombre),
+                        y: .value("Porcentaje", Double(r.porcentaje) ?? 0)
+                    )
+                    .foregroundStyle(.orange.gradient)
+                }
+                .frame(height: 150)
+            }
+        }
+    }
+    
+    
     
     
     private var pieChartSection: some View {
