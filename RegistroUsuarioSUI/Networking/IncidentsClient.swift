@@ -55,7 +55,7 @@ struct IncidentsClient {
         if let supervisor = supervisor {
             addFormField(&body, name: "supervisor", value: String(supervisor), boundary: boundary)
         }
-        addFormField(&body, name: "es_anonimo", value: es_anonimo ? "true" : "false", boundary: boundary)
+        addFormField(&body, name: "es_anonimo", value: es_anonimo ? "1" : "0", boundary: boundary)
         
         // Agregar archivos de fotos
         if let evidences = evidences, !evidences.isEmpty {

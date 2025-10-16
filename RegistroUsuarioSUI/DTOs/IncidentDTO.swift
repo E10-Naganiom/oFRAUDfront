@@ -91,7 +91,7 @@ struct IncidentFormResponse: Codable, Identifiable {
             self.es_anonimo = esBoolVal
         } else {
             let esStr = try container.decode(String.self, forKey: .es_anonimo)
-            self.es_anonimo = esStr.lowercased() == "true"
+            self.es_anonimo = esStr.lowercased() == "true" || esStr == "1"
         }
         
         self.evidencias = try container.decodeIfPresent([Evidence].self, forKey: .evidencias)
