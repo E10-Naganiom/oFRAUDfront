@@ -24,9 +24,18 @@ struct IncidentsClient {
         es_anonimo: Bool,
         evidences: [Data]?
     ) async throws -> IncidentFormResponse {
+        
+        // ✅ OBTENER TOKEN
+        guard let token = TokenStorage.get(identifier: "accessToken") else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
         let url = URL(string: "\(APIConfig.baseURL)/incidents")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "POST"
+        
+        // ✅ AGREGAR TOKEN
+        httpRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let boundary = UUID().uuidString
         httpRequest.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
@@ -43,7 +52,6 @@ struct IncidentsClient {
         addFormField(&body, name: "red_social", value: red_social ?? "", boundary: boundary)
         addFormField(&body, name: "descripcion", value: descripcion, boundary: boundary)
         addFormField(&body, name: "id_usuario", value: String(id_usuario), boundary: boundary)
-        //addFormField(&body, name: "supervisor", value: String(supervisor ?? 0), boundary: boundary)
         if let supervisor = supervisor {
             addFormField(&body, name: "supervisor", value: String(supervisor), boundary: boundary)
         }
@@ -83,60 +91,114 @@ struct IncidentsClient {
     }
     
     func GetHistorial(id: Int) async throws -> [IncidentFormResponse] {
+        // ✅ OBTENER TOKEN
+        guard let token = TokenStorage.get(identifier: "accessToken") else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
         let url = URL(string: "\(APIConfig.baseURL)/incidents/user/\(id)")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // ✅ AGREGAR TOKEN
+        httpRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
         let (data, _) = try await URLSession.shared.data(for: httpRequest)
         let response = try JSONDecoder().decode([IncidentFormResponse].self, from: data)
         return response
     }
     
     func GetEstatus(id: Int) async throws -> String {
+        // ✅ OBTENER TOKEN
+        guard let token = TokenStorage.get(identifier: "accessToken") else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
         let url = URL(string: "\(APIConfig.baseURL)/incidents/\(id)/status")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // ✅ AGREGAR TOKEN
+        httpRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
         let (data, _) = try await URLSession.shared.data(for: httpRequest)
         let response = try JSONDecoder().decode(StatusResponse.self, from: data)
         return response.descripcion
     }
     
     func GetUsuario(id: Int) async throws -> String {
+        // ✅ OBTENER TOKEN
+        guard let token = TokenStorage.get(identifier: "accessToken") else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
         let url = URL(string: "\(APIConfig.baseURL)/incidents/\(id)/username")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // ✅ AGREGAR TOKEN
+        httpRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
         let (data, _) = try await URLSession.shared.data(for: httpRequest)
         let response = try JSONDecoder().decode(NameResponse.self, from: data)
         return response.nombreCompleto
     }
     
     func GetFeed() async throws -> [IncidentFormResponse] {
+        // ✅ OBTENER TOKEN
+        guard let token = TokenStorage.get(identifier: "accessToken") else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
         let url = URL(string: "\(APIConfig.baseURL)/incidents/recent/incidents")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // ✅ AGREGAR TOKEN
+        httpRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
         let (data, _) = try await URLSession.shared.data(for: httpRequest)
         let response = try JSONDecoder().decode([IncidentFormResponse].self, from: data)
         return response
     }
     
     func GetStats() async throws -> StatsResponse {
+        // ✅ OBTENER TOKEN
+        guard let token = TokenStorage.get(identifier: "accessToken") else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
         let url = URL(string: "\(APIConfig.baseURL)/incidents/statistics/summary")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // ✅ AGREGAR TOKEN
+        httpRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
         let (data, _) = try await URLSession.shared.data(for: httpRequest)
         let response = try JSONDecoder().decode(StatsResponse.self, from: data)
         return response
     }
     
     func GetSummaryUser(id: Int) async throws -> SummaryResponse {
+        // ✅ OBTENER TOKEN
+        guard let token = TokenStorage.get(identifier: "accessToken") else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
         let url = URL(string: "\(APIConfig.baseURL)/incidents/user/\(id)/summary")!
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "GET"
         httpRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // ✅ AGREGAR TOKEN
+        httpRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
         let (data, _) = try await URLSession.shared.data(for: httpRequest)
         let response = try JSONDecoder().decode(SummaryResponse.self, from: data)
         return response

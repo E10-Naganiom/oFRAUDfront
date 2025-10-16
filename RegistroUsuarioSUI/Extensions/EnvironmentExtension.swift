@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftUICore
+import SwiftUI
 
 extension EnvironmentValues {
     @Entry var authController = AuthenticationController(httpClient: HTTPClient())

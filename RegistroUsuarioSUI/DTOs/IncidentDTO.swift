@@ -5,7 +5,7 @@
 //  Created by Usuario on 17/09/25.
 //
  import Foundation
-import SwiftUICore
+import SwiftUI
 
 
 struct IncidentFormRequest: Codable {

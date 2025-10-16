@@ -106,8 +106,11 @@ struct HistorialView: View {
             print("Cargado el historial del usuario")
             
             categories = try await categoriesController.getAllCategories()
+            print("categorias cargadas")
             
             datosResumen = try await incidentesController.getSummaryUser(id: profile.id)
+            print("datos resumen cargados")
+
         }
         catch {
             print("No se pudo acceder al historial del usuario: ", error)
