@@ -260,9 +260,9 @@ struct DashboardView: View {
     private var incidentesPorRedesSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Image(systemName: "eye")
+                Image(systemName: "network")
                     .foregroundColor(.orange)
-                Text("Incidentes clasificados por redes")
+                Text("Incidentes clasificados por redes sociales")
                     .font(.title2.bold())
             }
             
@@ -271,18 +271,21 @@ struct DashboardView: View {
                     .font(.largeTitle.bold())
                     .foregroundColor(.primary)
             }
+            
             HStack(spacing: 20) {
-                Chart(datosGraficas.redes_sociales, id: \.nombre) { r in
-                    BarMark(
-                        x: .value("Red Social", r.nombre),
-                        y: .value("Porcentaje", Double(r.porcentaje) ?? 0)
+                Chart(datosGraficas.redes_sociales, id: \.nombre) { red in
+                    SectorMark(
+                        angle: .value("Porcentaje", Double(red.porcentaje) ?? 0),
+                        innerRadius: .ratio(0.5), // puedes cambiarlo a 0.6 si quieres más hueco en el centro
+                        angularInset: 2
                     )
-                    .foregroundStyle(.orange.gradient)
+                    .foregroundStyle(by: .value("Red Social", red.nombre))
                 }
-                .frame(height: 150)
+                .frame(height: 200)
             }
         }
     }
+
     
     
     
