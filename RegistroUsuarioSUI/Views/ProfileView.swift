@@ -12,6 +12,7 @@ struct ProfileView: View {
     @State private var showUpdateSuccess = false
     @State private var isEditing = false
     @State private var showChangePassword = false
+    @State private var showDeactivateConfirmation = false
     @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     
     init(profileController: ProfileController = ProfileController(profileClient: ProfileClient())) {
@@ -43,6 +44,21 @@ struct ProfileView: View {
             print("Error al actualizar perfil: ", error)
         }
     }
+    
+    private func deactivateAccount() async {
+        do {
+            try await profileController.deactivateAccount(id: profile.id)
+            print("Cuenta desactivada correctamente")
+            await MainActor.run {
+                TokenStorage.delete(identifier: "accessToken")
+                TokenStorage.delete(identifier: "refreshToken")
+                isLoggedIn = false
+            }
+        } catch {
+            print("Error al desactivar cuenta: ", error)
+        }
+    }
+
     
     var body: some View {
         ScrollView {
@@ -136,6 +152,20 @@ struct ProfileView: View {
                         }
                         .padding(.top, 10)
                         
+                        // Botón desactivar cuenta
+                        Button(action: { showDeactivateConfirmation = true }) {
+                            HStack {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                Text("Desactivar cuenta")
+                            }
+                            .foregroundColor(.red)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.red.opacity(0.1))
+                            .cornerRadius(12)
+                        }
+                        .padding(.top, 10)
+                        
                         // Botón cerrar sesión
                         Button("Cerrar sesión", role: .destructive) {
                             TokenStorage.delete(identifier: "accessToken")
@@ -155,20 +185,35 @@ struct ProfileView: View {
         .alert("Perfil actualizado", isPresented: $showUpdateSuccess) {
             Button("OK", role: .cancel) {}
         }
+        .alert("¿Estás seguro?", isPresented: $showDeactivateConfirmation) {
+            Button("Cancelar", role: .cancel) {}
+            Button("Desactivar", role: .destructive) {
+                Task {
+                    await deactivateAccount()
+                }
+            }
+        } message: {
+            Text("Esta acción desactivará tu cuenta. Podrás reactivarla iniciando sesión nuevamente.")
+        }
         .sheet(isPresented: $showChangePassword) {
-            ChangePasswordView()
+            ChangePasswordView(profileController: profileController, userId: profile.id)
                 .presentationDetents([.medium, .large])
         }
         .task { await loadProfile() }
     }
 }
 
-// Nueva vista de cambiar contraseña
 struct ChangePasswordView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var currentPassword: String = ""
     @State private var newPassword: String = ""
     @State private var confirmPassword: String = ""
+    @State private var showSuccessAlert = false
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
+    
+    var profileController: ProfileController
+    var userId: Int
     
     var body: some View {
         NavigationStack {
@@ -181,8 +226,9 @@ struct ChangePasswordView: View {
                 
                 Section {
                     Button("Actualizar contraseña") {
-                        // Aquí pondrías la lógica para actualizar la contraseña
-                        dismiss()
+                        Task {
+                            await changePassword()
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.green)
@@ -194,6 +240,37 @@ struct ChangePasswordView: View {
             }
             .navigationTitle("Contraseña")
             .navigationBarTitleDisplayMode(.inline)
+            .alert("Contraseña actualizada", isPresented: $showSuccessAlert) {
+                Button("OK") { dismiss() }
+            }
+            .alert("Error", isPresented: $showErrorAlert) {
+                Button("OK") {}
+            } message: {
+                Text(errorMessage)
+            }
+        }
+    }
+    
+    private func changePassword() async {
+        guard !currentPassword.isEmpty, !newPassword.isEmpty, !confirmPassword.isEmpty else {
+            errorMessage = "Por favor completa todos los campos"
+            showErrorAlert = true
+            return
+        }
+        
+        do {
+            try await profileController.changePassword(
+                id: userId,
+                currentPassword: currentPassword,
+                newPassword: newPassword,
+                confirmPassword: confirmPassword
+            )
+            await MainActor.run { showSuccessAlert = true }
+        } catch {
+            await MainActor.run {
+                errorMessage = error.localizedDescription
+                showErrorAlert = true
+            }
         }
     }
 }

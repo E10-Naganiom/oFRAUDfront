@@ -1,8 +1,8 @@
 //
 //  ProfileController.swift
-//  RegistroUsuario452
+//  RegistroUsuarioSUI
 //
-//  Created by Gabriel gUTIERREZ on 12/09/25.
+//  Created by Gabriel Gutierrez on 12/09/25.
 //
 
 import Foundation
@@ -17,31 +17,44 @@ struct ProfileController {
     }
     
     func getProfile() async throws -> ProfileObs {
-            let accessToken = TokenStorage.get(identifier: "accessToken")!
-            let response = try await profileClient.getUserProfile(token: accessToken)
+        let accessToken = TokenStorage.get(identifier: "accessToken")!
+        let response = try await profileClient.getUserProfile(token: accessToken)
 
-
-            let profileObs = ProfileObs()
-            profileObs.id = response.profile.id
-            profileObs.nombre = response.profile.nombre
-            profileObs.apellido = response.profile.apellido
-            profileObs.email = response.profile.email
-            profileObs.contrasena = response.profile.contrasena
-            return profileObs
-        }
+        let profileObs = ProfileObs()
+        profileObs.id = response.profile.id
+        profileObs.nombre = response.profile.nombre
+        profileObs.apellido = response.profile.apellido
+        profileObs.email = response.profile.email
+        profileObs.contrasena = response.profile.contrasena
+        return profileObs
+    }
         
-        func updateProfile(_ profile: ProfileObs) async throws {
-            let accessToken = TokenStorage.get(identifier: "accessToken")!
-            try await profileClient.updateUserProfile(
-                id: profile.id,
-                nombre: profile.nombre,
-                apellido: profile.apellido,
-                email: profile.email,
-                contrasena: profile.contrasena,
-                token: accessToken
-            )
-        }
-
-
+    func updateProfile(_ profile: ProfileObs) async throws {
+        let accessToken = TokenStorage.get(identifier: "accessToken")!
+        try await profileClient.updateUserProfile(
+            id: profile.id,
+            nombre: profile.nombre,
+            apellido: profile.apellido,
+            email: profile.email,
+            contrasena: profile.contrasena,
+            token: accessToken
+        )
+    }
+    
+    func changePassword(id: Int, currentPassword: String, newPassword: String, confirmPassword: String) async throws {
+        let accessToken = TokenStorage.get(identifier: "accessToken")!
+        try await profileClient.changePassword(
+            id: id,
+            currentPassword: currentPassword,
+            newPassword: newPassword,
+            confirmPassword: confirmPassword,
+            token: accessToken
+        )
+    }
+    
+    func deactivateAccount(id: Int) async throws {
+        let accessToken = TokenStorage.get(identifier: "accessToken")!
+        try await profileClient.deactivateUser(id: id)
+    }
 
 }
