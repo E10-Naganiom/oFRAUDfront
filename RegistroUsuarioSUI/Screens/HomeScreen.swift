@@ -10,37 +10,48 @@ import SwiftUI
 struct HomeScreen: View {
     @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
     var body: some View {
-            TabView{
-                Tab{
-                    NavigationStack{
-                        DashboardView()
-                    }
-                }label:{
-                    Label("Inicio", systemImage:"house.and.flag")
+        TabView{
+            Tab{
+                NavigationStack{
+                    DashboardView()
                 }
-                Tab{
-                    NavigationStack{
-                        HistorialView()
-                    }
-                }label:{
-                    Label("Historial", systemImage: "clock.arrow.circlepath")
+            }label:{
+                Label("Inicio", systemImage:"house.and.flag")
+            }
+            
+            Tab{
+                NavigationStack{
+                    HistorialView()
                 }
-                Tab{
-                    NavigationStack{
-                        GuidesView()
-                    }
-                }label:{
-                    Label("Guias", systemImage: "book")
+            }label:{
+                Label("Historial", systemImage: "clock.arrow.circlepath")
+            }
+            
+            Tab{
+                NavigationStack{
+                    GuidesView()
                 }
-                Tab{
-                    NavigationStack{
-                        ProfileView()
-                    }
-                }label: {
-                    Label("Perfil", systemImage: "person.crop.circle")
+            }label:{
+                Label("Guias", systemImage: "book")
+            }
+            
+            Tab{
+                NavigationStack{
+                    StatisticsView()
                 }
-            }.tint(.green)
-        }
+            }label:{
+                Label("Estadísticas", systemImage: "chart.bar.fill")
+            }
+            
+            Tab{
+                NavigationStack{
+                    ProfileView()
+                }
+            }label: {
+                Label("Perfil", systemImage: "person.crop.circle")
+            }
+        }.tint(.green)
+    }
 }
 
 #Preview {

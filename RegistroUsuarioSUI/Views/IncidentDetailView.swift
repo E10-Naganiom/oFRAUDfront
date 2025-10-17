@@ -43,7 +43,7 @@ struct IncidentDetailView: View {
                     Spacer()
                     
                     // Solo mostrar botón de editar si NO está aprobado (id_estatus != 2)
-                    if incidente.id_estatus != 2 {
+                    if incidente.id_estatus == 2 {
                         Button(action: { isEditing.toggle() }) {
                             Image(systemName: "pencil.circle.fill")
                                 .foregroundColor(.green)

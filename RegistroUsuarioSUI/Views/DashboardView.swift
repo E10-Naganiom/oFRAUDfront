@@ -1,5 +1,4 @@
 import SwiftUI
-import Charts // para las gráficas
 
 struct DashboardView: View {
     @State private var searchText = ""
@@ -8,7 +7,6 @@ struct DashboardView: View {
     
     @State private var latestIncidents: [IncidentFormResponse] = []
     @State private var categories: [CategoryFormResponse] = []
-    @State private var datosGraficas: StatsResponse = StatsResponse(total_incidentes: 0, total_categorias: 0, por_estatus: [], por_categoria: [], metodos_contacto: [], redes_sociales: [])
     
     let filtros = ["Todas", "Phishing", "Malware", "Ransomware", "Fraude"]
     
@@ -60,7 +58,6 @@ struct DashboardView: View {
                     headerSection
                     searchSection
                     recentActivitySection
-                    statisticsSection
                     securityTipSection
                     organizationSection
                 }
@@ -78,7 +75,6 @@ struct DashboardView: View {
         }
         .task {
             await getFeed()
-            await getNumsGraficas()
         }
     }
     
@@ -93,19 +89,6 @@ struct DashboardView: View {
         }
         catch {
             print("No se pudo obtener el feed ni categorias de los incidentes: \(error)")
-        }
-    }
-    
-    private func getNumsGraficas() async {
-        loadingFeed = true
-        defer { loadingFeed = false }
-        let controller = IncidentsController(incidensClient: IncidentsClient())
-        do {
-            datosGraficas = try await controller.getEstadisticas()
-            print("Datos para graficas cargados exitosamente")
-        }
-        catch {
-            print("No se pudieron obtener las estadisticas: \(error)")
         }
     }
     
@@ -163,269 +146,6 @@ struct DashboardView: View {
             }
         }
         .padding(.vertical)
-    }
-    
-    private var statisticsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-//            pieChartSection
-//            barChartSection
-            incidentesPorEstatusSection
-            incidentesPorCategoriaSection
-            incidentesPorMetodoSection
-            incidentesPorRedesSection
-        }
-    }
-    
-    private var incidentesPorEstatusSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "network")
-                    .foregroundColor(.orange)
-                Text("Incidentes clasificados por estatus")
-                    .font(.title2.bold())
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("\(datosGraficas.total_incidentes) Categorias reportadas al momento")
-                    .font(.largeTitle.bold())
-                    .foregroundColor(.primary)
-            }
-            HStack(spacing: 20) {
-                Chart(datosGraficas.por_estatus, id: \.estatus) { e in
-                    SectorMark(
-                        angle: .value("Porcentaje", e.porcentaje),
-                        innerRadius: .ratio(0.6)
-                    )
-                    .foregroundStyle(by: .value("Estatus", e.estatus))
-                }
-                .frame(height: 200)
-            }
-        }
-    }
-    
-    private var incidentesPorMetodoSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "envelope")
-                    .foregroundColor(.orange)
-                Text("Incidentes clasificados por metodos de contacto")
-                    .font(.title2.bold())
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("\(datosGraficas.total_incidentes) Incidentes reportados al momento")
-                    .font(.largeTitle.bold())
-                    .foregroundColor(.primary)
-            }
-            HStack(spacing: 20) {
-                Chart(datosGraficas.metodos_contacto, id: \.metodo) { m in
-                    BarMark(
-                        x: .value("Porcentaje", Double(m.porcentaje) ?? 0),
-                        y: .value("Metodo", m.metodo)
-                    )
-                    .foregroundStyle(.green.gradient)
-                }
-                .frame(height: 150)
-            }
-        }
-    }
-    
-    private var incidentesPorCategoriaSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "eye")
-                    .foregroundColor(.orange)
-                Text("Incidentes clasificados por categoria")
-                    .font(.title2.bold())
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("\(datosGraficas.total_categorias) Incidentes reportados al momento")
-                    .font(.largeTitle.bold())
-                    .foregroundColor(.primary)
-            }
-            HStack(spacing: 20) {
-                Chart(datosGraficas.por_categoria, id: \.titulo) { c in
-                    BarMark(
-                        x: .value("Categoria", c.titulo),
-                        y: .value("Porcentaje", Double(c.porcentaje) ?? 0)
-                    )
-                    .foregroundStyle(.blue.gradient)
-                }
-                .frame(height: 200)
-            }
-        }
-    }
-    
-    private var incidentesPorRedesSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "network")
-                    .foregroundColor(.orange)
-                Text("Incidentes clasificados por redes sociales")
-                    .font(.title2.bold())
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("\(datosGraficas.total_categorias) Incidentes reportados al momento")
-                    .font(.largeTitle.bold())
-                    .foregroundColor(.primary)
-            }
-            
-            HStack(spacing: 20) {
-                Chart(datosGraficas.redes_sociales, id: \.nombre) { red in
-                    SectorMark(
-                        angle: .value("Porcentaje", Double(red.porcentaje) ?? 0),
-                        innerRadius: .ratio(0.5), // puedes cambiarlo a 0.6 si quieres más hueco en el centro
-                        angularInset: 2
-                    )
-                    .foregroundStyle(by: .value("Red Social", red.nombre))
-                }
-                .frame(height: 200)
-            }
-        }
-    }
-
-    
-    
-    
-    
-    private var pieChartSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "network")
-                    .foregroundColor(.orange)
-                Text("Incidentes clasificados por estatus")
-                    .font(.title2.bold())
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("\(totalSessions.formatted())")
-                    .font(.largeTitle.bold())
-                    .foregroundColor(.primary)
-                
-                Text("Total de sesiones • Por fuente")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            
-            HStack(spacing: 20) {
-                Chart(trafficSources, id: \.0) { source in
-                    SectorMark(
-                        angle: .value("Count", source.1),
-                        innerRadius: .ratio(0.5),
-                        angularInset: 2
-                    )
-                    .foregroundStyle(source.3)
-                }
-                .frame(width: 120, height: 120)
-                
-                pieChartLegend
-            }
-        }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-    }
-    
-    private var pieChartLegend: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ForEach(Array(trafficSources.enumerated()), id: \.offset) { index, source in
-                HStack {
-                    Circle()
-                        .fill(source.3)
-                        .frame(width: 8, height: 8)
-                    
-                    Text(source.0)
-                        .font(.caption)
-                        .foregroundColor(.primary)
-                    
-                    Spacer()
-                    
-                    VStack(alignment: .trailing, spacing: 0) {
-                        Text("\(source.1.formatted())")
-                            .font(.caption.bold())
-                            .foregroundColor(.primary)
-                        
-                        Text("\(source.2, specifier: "%.1f")%")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 1)
-                            .background(Color(.quaternarySystemFill))
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                    }
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-    
-    private var barChartSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "eye")
-                    .foregroundColor(.orange)
-                Text("Número de Reportes")
-                    .font(.title2.bold())
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("\(currentVisits.formatted())")
-                    .font(.largeTitle.bold())
-                    .foregroundColor(.primary)
-                
-                Text("Visitas totales • Tendencia")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            
-            Chart(visitData, id: \.0) { data in
-                BarMark(
-                    x: .value("Periodo", data.0),
-                    y: .value("Visitas", data.1)
-                )
-                .foregroundStyle(data.0 == "Mes Actual" ? Color.green : Color.blue)
-                .cornerRadius(4)
-            }
-            .frame(height: 150)
-            .chartXAxis(.hidden)
-            .chartYAxis(.hidden)
-            
-            barChartStats
-        }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-    }
-    
-    private var barChartStats: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Período Anterior")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                
-                Text("\(previousVisits.formatted())")
-                    .font(.headline.bold())
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            Rectangle()
-                .fill(.gray.opacity(0.3))
-                .frame(width: 1, height: 30)
-            
-            VStack(alignment: .trailing, spacing: 4) {
-                Text("Período Actual")
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                
-                Text("\(currentVisits.formatted())")
-                    .font(.headline.bold())
-            }
-            .frame(maxWidth: .infinity, alignment: .trailing)
-        }
-        .padding(.top, 8)
     }
     
     private var recentActivitySection: some View {

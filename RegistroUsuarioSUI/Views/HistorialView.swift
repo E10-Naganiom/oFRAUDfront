@@ -81,7 +81,7 @@ struct HistorialView: View {
                     Text("Pendientes: \(datosResumen.total_pendientes)")
                     Text("Rechazados: \(datosResumen.total_rechazados)")
                 }
-                .padding().frame(maxWidth: .infinity, alignment: .leading).background(Color(.green)).cornerRadius(10).padding()
+                .padding().frame(maxWidth: .infinity, alignment: .leading).foregroundColor(.white).background(Color(.green)).cornerRadius(10).padding()
             }
             .navigationTitle("Mi Historial")
             .task {
