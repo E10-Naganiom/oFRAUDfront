@@ -3,11 +3,17 @@ import Foundation
 struct IncidentsClient {
     
     struct StatusResponse: Codable {
-        let descripcion: String
+        let id_incidente: Int
+        let id_estatus: Int
+        let estatus: String
+        let titulo: String
     }
     
     struct NameResponse: Codable {
-        let nombreCompleto: String
+        let id_incidente: Int
+        let id_usuario: Int
+        let nombre_completo: String
+        let titulo: String
     }
 
     func CreateIncident(
@@ -125,7 +131,7 @@ struct IncidentsClient {
         
         let (data, _) = try await URLSession.shared.data(for: httpRequest)
         let response = try JSONDecoder().decode(StatusResponse.self, from: data)
-        return response.descripcion
+        return response.estatus
     }
     
     func GetUsuario(id: Int) async throws -> String {
@@ -144,7 +150,7 @@ struct IncidentsClient {
         
         let (data, _) = try await URLSession.shared.data(for: httpRequest)
         let response = try JSONDecoder().decode(NameResponse.self, from: data)
-        return response.nombreCompleto
+        return response.nombre_completo 
     }
     
     func GetFeed() async throws -> [IncidentFormResponse] {

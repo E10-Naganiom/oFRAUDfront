@@ -111,11 +111,13 @@ struct IncidentCardView: View {
     private func fetchDatosIncidente(incident: IncidentFormResponse) async {
         let incidentsController = IncidentsController(incidensClient: IncidentsClient())
         do {
-            estatus = try await incidentsController.getStatus(id: incident.id_estatus)
-            nombreCompleto = try await incidentsController.getCompleteName(id: incident.id_usuario)
+            estatus = try await incidentsController.getStatus(id: incident.id)
+            print("Estatus de incidente cargado")
+            nombreCompleto = try await incidentsController.getCompleteName(id: incident.id)
+            print("Nombres completos cargados")
         }
         catch {
-            print("No se pudo obtener datos del incidente \(incident.id)")
+            print("No se pudo obtener datos del incidentee \(incident.id)")
             estatus = "Desconocido"
         }
     }

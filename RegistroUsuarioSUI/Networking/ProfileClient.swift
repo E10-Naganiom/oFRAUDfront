@@ -47,14 +47,14 @@ class ProfileClient {
             fatalError("Invalid URL")
         }
         var urlRequest = URLRequest(url: url)
-        urlRequest.httpMethod = "PUT"
+        urlRequest.httpMethod = "PATCH"
         urlRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let body: [String: Any] = [
-            "current_password": currentPassword,
-            "new_password": newPassword,
-            "confirm_password": confirmPassword
+            "currentPassword": currentPassword,
+            "newPassword": newPassword,
+            "confirmPassword": confirmPassword
         ]
         
         urlRequest.httpBody = try JSONSerialization.data(withJSONObject: body)
