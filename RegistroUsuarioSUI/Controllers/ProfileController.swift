@@ -17,7 +17,9 @@ struct ProfileController {
     }
     
     func getProfile() async throws -> ProfileObs {
-        let accessToken = TokenStorage.get(identifier: "accessToken")!
+        guard let accessToken = TokenStorage.get(identifier: "accessToken") else {
+            throw URLError(.userAuthenticationRequired)
+        }
         let response = try await profileClient.getUserProfile(token: accessToken)
 
         let profileObs = ProfileObs()
