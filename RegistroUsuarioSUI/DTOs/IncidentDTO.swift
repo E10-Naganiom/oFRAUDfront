@@ -100,9 +100,12 @@ struct IncidentFormResponse: Codable, Identifiable {
         self.id_estatus = try container.decode(Int.self, forKey: .id_estatus)
         self.supervisor = try container.decodeIfPresent(Int.self, forKey: .supervisor)
         
-        // Decodificar es_anonimo como Bool o String
+        // ✨ MODIFICADO: Decodificar es_anonimo como Bool, Int o String
         if let esBoolVal = try? container.decode(Bool.self, forKey: .es_anonimo) {
             self.es_anonimo = esBoolVal
+        } else if let esIntVal = try? container.decode(Int.self, forKey: .es_anonimo) {
+            // Manejar cuando viene como número (0 o 1)
+            self.es_anonimo = esIntVal == 1
         } else {
             let esStr = try container.decode(String.self, forKey: .es_anonimo)
             self.es_anonimo = esStr.lowercased() == "true" || esStr == "1"
