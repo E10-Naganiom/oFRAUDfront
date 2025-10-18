@@ -20,10 +20,48 @@ struct HistorialView: View {
     @State private var categories: [CategoryFormResponse] = []
     @State private var datosResumen: SummaryResponse = SummaryResponse(total_incidentes: 0, total_aprobados: 0, total_pendientes: 0, total_rechazados: 0)
     
-    let statusOptions = ["Todos los estatus", "Aprobados", "Pendientes"]
+    let statusOptions = ["Todos los estatus", "Aprobados", "Pendientes", "Rechazados"]
     
     init(){
         self.categoriesController = CategoriesController(categoriesClient: CategoriesClient())
+    }
+    
+    // ✨ NUEVA: Función auxiliar para filtrar por estatus
+    private func filtrarPorEstatus(_ incidents: [IncidentFormResponse]) -> [IncidentFormResponse] {
+        switch selectedStatus {
+        case "Aprobados":
+            return incidents.filter { $0.id_estatus == 2 }
+        case "Pendientes":
+            return incidents.filter { $0.id_estatus == 1 }
+        case "Rechazados":
+            return incidents.filter { $0.id_estatus == 3 }
+        default: // "Todos los estatus"
+            return incidents
+        }
+    }
+    
+    // ✨ NUEVA: Propiedad computada para filtrar incidentes en tiempo real
+    var filteredIncidents: [IncidentFormResponse] {
+        var result = incidents
+        
+        // Filtro por estatus
+        result = filtrarPorEstatus(result)
+        
+        // Filtro por texto de búsqueda
+        let trimmedSearch = searchText.trimmingCharacters(in: .whitespaces)
+        if !trimmedSearch.isEmpty {
+            result = result.filter { incident in
+                let searchLower = trimmedSearch.lowercased()
+                let categoriaNombre = obtenerNombreCategoria(id: incident.id_categoria).lowercased()
+                
+                return String(incident.id).contains(searchLower) ||
+                       incident.titulo.lowercased().contains(searchLower) ||
+                       categoriaNombre.contains(searchLower) ||
+                       incident.descripcion.lowercased().contains(searchLower)
+            }
+        }
+        
+        return result
     }
     
     var body: some View {
@@ -40,14 +78,33 @@ struct HistorialView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
                 
-                TextField("Buscar reportes por ID, categoria o titulo", text: $searchText)
-                    .padding(10)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                    .padding(.top, 5)
-                    .padding(.horizontal)
-                
+                // ✨ MODIFICADO: TextField con botón para limpiar
                 HStack {
+                    TextField("Buscar reportes por ID, categoria o titulo", text: $searchText)
+                        .padding(10)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+                        .autocorrectionDisabled() // ✨ Desactivar autocorrección
+                    
+                    // ✨ NUEVO: Botón para limpiar búsqueda
+                    if !searchText.isEmpty {
+                        Button(action: {
+                            searchText = ""
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.gray)
+                                .padding(.trailing, 8)
+                        }
+                    }
+                }
+                .padding(.top, 5)
+                .padding(.horizontal)
+                
+                // ✨ MODIFICADO: Solo Picker, sin botón "Buscar"
+                HStack {
+                    Image(systemName: "line.3.horizontal.decrease.circle")
+                        .padding(.leading)
+                    
                     Picker("Filtrar por estatus", selection: $selectedStatus){
                         ForEach(statusOptions, id: \.self){ status in
                             Text(status)
@@ -56,17 +113,21 @@ struct HistorialView: View {
                     .pickerStyle(MenuPickerStyle())
                     .padding(.horizontal)
                     
-                    NavigationLink(destination: HistorialView()){
-                        Text("Buscar")
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(Color.green)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                    }
+                    Spacer()
+                    
+                    // ✨ ELIMINADO: NavigationLink con botón "Buscar"
+                    // El filtrado ahora es automático
                 }
                 
-                // Removed nested ScrollView - now just LazyVStack
+                // ✨ NUEVO: Contador de resultados
+                if !searchText.isEmpty || selectedStatus != "Todos los estatus" {
+                    Text("\(filteredIncidents.count) resultado(s) encontrado(s)")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
+                }
+                
+                // ✨ MODIFICADO: Usa filteredIncidents en lugar de incidents
                 LazyVStack(spacing: 12) {
                     if isLoading {
                         VStack {
@@ -74,17 +135,43 @@ struct HistorialView: View {
                                 .padding()
                         }
                     } else if incidents.isEmpty {
-                        Text("No tienes reportes aún")
-                            .foregroundColor(.secondary)
-                            .padding()
+                        // ✨ MODIFICADO: Mensaje cuando no hay datos del backend
+                        VStack(spacing: 8) {
+                            Image(systemName: "doc.text")
+                                .font(.system(size: 40))
+                                .foregroundColor(.gray)
+                            Text("No tienes reportes aún")
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                            Text("Tus reportes aparecerán aquí")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding()
+                    } else if filteredIncidents.isEmpty {
+                        // ✨ NUEVO: Mensaje cuando hay datos pero no coinciden con la búsqueda
+                        VStack(spacing: 8) {
+                            Image(systemName: "magnifyingglass")
+                                .font(.system(size: 40))
+                                .foregroundColor(.gray)
+                            Text("No se encontraron coincidencias")
+                                .font(.headline)
+                                .foregroundColor(.secondary)
+                            Text("Intenta con otros términos de búsqueda o filtros")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding()
                     } else {
-                        ForEach(incidents) { incident in
+                        // ✨ MODIFICADO: Usa filteredIncidents en lugar de incidents
+                        ForEach(filteredIncidents) { incident in
                             IncidentCardView(incident: incident, categories: categories)
                                 .padding(.horizontal)
                         }
                     }
                 }
                 
+                // Sección de resumen (sin cambios)
                 VStack(alignment: .leading, spacing: 5){
                     Text("Resumen").font(.headline)
                     Text("Total de reportes: \(datosResumen.total_incidentes)")
