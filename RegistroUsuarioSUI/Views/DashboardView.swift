@@ -47,6 +47,32 @@ struct DashboardView: View {
     var currentVisits: Int { 4180 }
     var previousVisits: Int { 3250 }
     
+    // ✨ NUEVA: Propiedad computada para filtrar incidentes en tiempo real
+    var filteredIncidents: [IncidentFormResponse] {
+        var result = latestIncidents
+        
+        // Filtro por texto de búsqueda
+        let trimmedSearch = searchText.trimmingCharacters(in: .whitespaces)
+        if !trimmedSearch.isEmpty {
+            result = result.filter { incident in
+                let searchLower = trimmedSearch.lowercased()
+                return String(incident.id).contains(searchLower) ||
+                       incident.titulo.lowercased().contains(searchLower) ||
+                       incident.descripcion.lowercased().contains(searchLower)
+            }
+        }
+        
+        // Filtro por categoría seleccionada
+        if selectedFilter != "Todas" {
+            // Buscar el ID de la categoría seleccionada
+            if let selectedCategory = categories.first(where: { $0.titulo == selectedFilter }) {
+                result = result.filter { $0.id_categoria == selectedCategory.id }
+            }
+        }
+        
+        return result
+    }
+    
     var body: some View {
         ZStack {
             // Fondo adaptable al modo oscuro/claro
@@ -103,49 +129,61 @@ struct DashboardView: View {
         }
     }
     
+    // ✨ MODIFICADA: Sección de búsqueda sin botón "Buscar"
     private var searchSection: some View {
         VStack {
             HStack {
                 TextField("Buscar incidentes por ID, tipo de incidente", text: $searchText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .autocorrectionDisabled() // ✨ Desactivar autocorrección
                     .padding(.bottom, 8)
+                
+                // ✨ NUEVO: Botón para limpiar búsqueda
+                if !searchText.isEmpty {
+                    Button(action: {
+                        searchText = ""
+                    }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.gray)
+                    }
+                    .padding(.bottom, 8)
+                }
             }
             
             HStack {
-                Image(systemName: "magnifyingglass")
+                Image(systemName: "line.3.horizontal.decrease.circle")
                 Text("Filtrar por categoría")
-                
-//                Picker("Filtrar por tipo", selection: $selectedFilter) {
-//                    ForEach(filtros, id: \.self) { tipo in
-//                        Text(tipo)
-//                    }
-//                }
                 
                 if loadingFeed {
                     ProgressView("Cargando categorias ...")
                 } else {
                     Picker("Categoria", selection: $selectedFilter){
+                        Text("Todas").tag("Todas")
                         ForEach(categories, id: \.id) { cat in
-                            Text(cat.titulo).tag(Optional(cat.id))
+                            Text(cat.titulo).tag(cat.titulo)
                         }
                     }
                     .pickerStyle(MenuPickerStyle())
                     .padding(.horizontal)
                 }
                 
-                NavigationLink(destination: ResultsView()) {
-                    Text("Buscar")
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
+                // ✨ ELIMINADO: NavigationLink con botón "Buscar"
+                // El filtrado ahora es automático
+            }
+            
+            // ✨ NUEVO: Contador de resultados
+            if !searchText.isEmpty || selectedFilter != "Todas" {
+                Text("\(filteredIncidents.count) resultado(s) encontrado(s)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 4)
             }
         }
         .padding(.vertical)
     }
     
+    // ✨ MODIFICADA: Ahora usa filteredIncidents en lugar de latestIncidents
     private var recentActivitySection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -168,12 +206,29 @@ struct DashboardView: View {
                         .padding()
                         .frame(maxWidth: .infinity)
                 } else if latestIncidents.isEmpty {
-                    Text("No hay feed reciente")
+                    // ✨ MODIFICADO: Mensaje cuando no hay datos del backend
+                    Text("No hay incidentes registrados")
                         .foregroundColor(.secondary)
                         .padding()
                         .frame(maxWidth: .infinity)
+                } else if filteredIncidents.isEmpty {
+                    // ✨ NUEVO: Mensaje cuando hay datos pero no coinciden con la búsqueda
+                    VStack(spacing: 8) {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 40))
+                            .foregroundColor(.gray)
+                        Text("No se encontraron coincidencias")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
+                        Text("Intenta con otros términos de búsqueda")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
                 } else {
-                    ForEach(latestIncidents) { incident in
+                    // ✨ MODIFICADO: Usa filteredIncidents en lugar de latestIncidents
+                    ForEach(filteredIncidents) { incident in
                         IncidentCardView(incident: incident, categories: categories)
                             .padding()
                             .clipShape(RoundedRectangle(cornerRadius: 16))
