@@ -157,7 +157,7 @@ struct IncidentDetailView: View {
                             .background(Color(.systemGray5))
                             .cornerRadius(8)
                     } else {
-                        Text(editedIncident.descripcion)
+                        Text(editedIncident.descripcion).frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
                 .padding().frame(maxWidth: .infinity)
