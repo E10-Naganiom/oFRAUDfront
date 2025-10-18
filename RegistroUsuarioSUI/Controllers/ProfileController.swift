@@ -50,7 +50,7 @@ struct ProfileController {
             currentPassword: currentPassword,
             newPassword: newPassword,
             confirmPassword: confirmPassword,
-            token: accessToken
+            //token: accessToken
         )
     }
     

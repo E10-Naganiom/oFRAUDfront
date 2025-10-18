@@ -43,7 +43,7 @@ struct IncidentDetailView: View {
                     Spacer()
                     
                     // Solo mostrar botón de editar si NO está aprobado (id_estatus != 2)
-                    if incidente.id_estatus == 2 {
+                    if incidente.id_estatus == 1 {
                         Button(action: { isEditing.toggle() }) {
                             Image(systemName: "pencil.circle.fill")
                                 .foregroundColor(.green)
@@ -280,7 +280,7 @@ struct IncidentDetailView: View {
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                 
                 // Botón guardar (solo visible cuando está editando Y NO está aprobado)
-                if isEditing && incidente.id_estatus != 2 {
+                if isEditing && incidente.id_estatus == 1 {
                     Button("Guardar cambios") {
                         Task {
                             await updateIncident()

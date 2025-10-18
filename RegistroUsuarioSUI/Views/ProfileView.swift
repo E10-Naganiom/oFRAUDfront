@@ -23,6 +23,7 @@ struct ProfileView: View {
         do {
             let p = try await profileController.getProfile()
             await MainActor.run {
+                profile.id = p.id
                 profile.email = p.email
                 profile.nombre = p.nombre
                 profile.apellido = p.apellido
@@ -259,6 +260,7 @@ struct ChangePasswordView: View {
         }
         
         do {
+            print("Intentando cambiar la contrasena de usuario ", userId)
             try await profileController.changePassword(
                 id: userId,
                 currentPassword: currentPassword,

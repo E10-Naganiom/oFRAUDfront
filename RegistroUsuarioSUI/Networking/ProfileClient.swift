@@ -42,7 +42,11 @@ class ProfileClient {
         }
     }
     
-    func changePassword(id: Int, currentPassword: String, newPassword: String, confirmPassword: String, token: String) async throws {
+    func changePassword(id: Int, currentPassword: String, newPassword: String, confirmPassword: String) async throws {
+        guard let token = TokenStorage.get(identifier: "accessToken") else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
         guard let url = URL(string: "\(APIConfig.baseURL)/users/\(id)/change-password") else {
             fatalError("Invalid URL")
         }
