@@ -19,12 +19,26 @@ struct IncidentDetailView: View {
     @State private var editedIncident: EditableIncident
     @State private var showUpdateSuccess = false
     
+    // ✨ NUEVOS: Estados para manejo de actualización
+    @State private var showUpdateError = false
+    @State private var errorMessage = ""
+    @State private var isUpdating = false
+    @State private var updatedIncidentData: IncidentFormResponse?
+    
+    // ✨ NUEVO: Environment para cerrar la vista después de actualizar (opcional)
+    @Environment(\.dismiss) private var dismiss
+    
     init(incidente: IncidentFormResponse, categories: [CategoryFormResponse], estatus: String, nombreCompleto: String) {
         self.incidente = incidente
         self.categories = categories
         self.estatus = estatus
         self.nombreCompleto = nombreCompleto
         _editedIncident = State(initialValue: EditableIncident(from: incidente))
+    }
+    
+    // ✨ MODIFICADO: Usar datos actualizados si existen, sino los originales
+    private var currentIncident: IncidentFormResponse {
+        updatedIncidentData ?? incidente
     }
     
     var body: some View {
@@ -43,10 +57,10 @@ struct IncidentDetailView: View {
                     Spacer()
                     
                     // Solo mostrar botón de editar si NO está aprobado (id_estatus != 2)
-                    if incidente.id_estatus == 1 {
+                    if currentIncident.id_estatus == 1 {
                         Button(action: { isEditing.toggle() }) {
-                            Image(systemName: "pencil.circle.fill")
-                                .foregroundColor(.green)
+                            Image(systemName: isEditing ? "xmark.circle.fill" : "pencil.circle.fill")
+                                .foregroundColor(isEditing ? .red : .green)
                                 .font(.system(size: 32))
                         }
                     }
@@ -96,7 +110,7 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        if(!incidente.es_anonimo){
+                        if(!currentIncident.es_anonimo){
                             Text(nombreCompleto)
                                 .font(.subheadline.bold())
                         }
@@ -116,8 +130,8 @@ struct IncidentDetailView: View {
                             .font(.subheadline.bold())
                             .padding(.horizontal, 10)
                             .padding(.vertical, 4)
-                            .background(getColorStatus(incidente.id_estatus).opacity(0.15))
-                            .foregroundColor(getColorStatus(incidente.id_estatus))
+                            .background(getColorStatus(currentIncident.id_estatus).opacity(0.15))
+                            .foregroundColor(getColorStatus(currentIncident.id_estatus))
                             .cornerRadius(12)
                     }
                     
@@ -127,7 +141,7 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text(formatISODate(incidente.fecha_creacion))
+                        Text(formatISODate(currentIncident.fecha_creacion))
                             .font(.subheadline)
                     }
                     
@@ -137,7 +151,7 @@ struct IncidentDetailView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Text(formatISODate(incidente.fecha_actualizacion))
+                        Text(formatISODate(currentIncident.fecha_actualizacion))
                             .font(.subheadline)
                     }
                     
@@ -279,21 +293,34 @@ struct IncidentDetailView: View {
                 .cornerRadius(16)
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                 
-                // Botón guardar (solo visible cuando está editando Y NO está aprobado)
-                if isEditing && incidente.id_estatus == 1 {
-                    Button("Guardar cambios") {
+                // ✨ MODIFICADO: Botón guardar con loading state
+                if isEditing && currentIncident.id_estatus == 1 {
+                    Button(action: {
                         Task {
                             await updateIncident()
                         }
-                        isEditing = false
+                    }) {
+                        HStack {
+                            if isUpdating {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                Text("Guardando...")
+                            } else {
+                                Image(systemName: "checkmark.circle.fill")
+                                Text("Guardar cambios")
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(isUpdating ? Color.gray : Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.green)
-                    .frame(maxWidth: .infinity)
+                    .disabled(isUpdating)
                 }
                 
                 // Evidencias (no editables por ahora)
-                if let evidencias = incidente.evidencias, !evidencias.isEmpty {
+                if let evidencias = currentIncident.evidencias, !evidencias.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Evidencias")
                             .font(.headline)
@@ -362,8 +389,19 @@ struct IncidentDetailView: View {
         }
         .navigationTitle("Incidente")
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Incidente actualizado", isPresented: $showUpdateSuccess) {
+        // ✨ MODIFICADO: Alert de éxito con mejor mensaje
+        .alert("✅ Incidente actualizado", isPresented: $showUpdateSuccess) {
+            Button("OK", role: .cancel) {
+                isEditing = false
+            }
+        } message: {
+            Text("Los cambios se guardaron correctamente")
+        }
+        // ✨ NUEVO: Alert de error
+        .alert("❌ Error al actualizar", isPresented: $showUpdateError) {
             Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage)
         }
     }
     
@@ -376,13 +414,40 @@ struct IncidentDetailView: View {
         return "No especificada"
     }
     
+    // ✨ MODIFICADA: Función updateIncident completa con refresh
     private func updateIncident() async {
+        isUpdating = true
+        defer { isUpdating = false }
+        
         let incidentsController = IncidentsController(incidensClient: IncidentsClient())
+        
         do {
-            print("Incidente actualizado: \(editedIncident)")
+            // Llamar al endpoint de actualización
+            let updatedIncident = try await incidentsController.updateIncident(
+                id: incidente.id,
+                titulo: editedIncident.titulo,
+                id_categoria: editedIncident.id_categoria,
+                nombre_atacante: editedIncident.nombre_atacante,
+                telefono: editedIncident.telefono,
+                correo: editedIncident.correo,
+                user_red: editedIncident.user_red,
+                red_social: editedIncident.red_social,
+                descripcion: editedIncident.descripcion
+            )
+            
+            // ✨ Actualizar los datos locales con la respuesta del servidor
+            updatedIncidentData = updatedIncident
+            
+            // ✨ Actualizar editedIncident para reflejar los cambios
+            editedIncident = EditableIncident(from: updatedIncident)
+            
+            print("✅ Incidente actualizado exitosamente: \(updatedIncident)")
             showUpdateSuccess = true
+            
         } catch {
-            print("Error al actualizar incidente: \(error)")
+            print("❌ Error al actualizar incidente: \(error)")
+            errorMessage = "No se pudo actualizar el incidente. Por favor intenta de nuevo."
+            showUpdateError = true
         }
     }
 }
