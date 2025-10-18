@@ -66,7 +66,6 @@ struct DashboardView: View {
             
             floatingActionButton
         }
-        .navigationTitle("Dashboard")
         .onAppear {
             // Selecciona un consejo aleatorio al aparecer la vista
             if let randomTip = securityTips.randomElement() {
@@ -98,10 +97,9 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Bienvenid@ a oFraud")
                 .font(.title.bold())
-                .padding(.top)
             
             Text("Mantente protegido con las últimas actualizaciones de seguridad")
-                .font(.headline)
+                .font(.subheadline).foregroundColor(.gray)
         }
     }
     
@@ -149,7 +147,7 @@ struct DashboardView: View {
     }
     
     private var recentActivitySection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Actividad reciente")
                     .font(.title2.bold())

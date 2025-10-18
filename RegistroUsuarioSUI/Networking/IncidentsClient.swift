@@ -31,7 +31,6 @@ struct IncidentsClient {
         evidences: [Data]?
     ) async throws -> IncidentFormResponse {
         
-        // ✅ OBTENER TOKEN
         guard let token = TokenStorage.get(identifier: "accessToken") else {
             throw URLError(.userAuthenticationRequired)
         }
@@ -40,7 +39,6 @@ struct IncidentsClient {
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = "POST"
         
-        // ✅ AGREGAR TOKEN
         httpRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let boundary = UUID().uuidString

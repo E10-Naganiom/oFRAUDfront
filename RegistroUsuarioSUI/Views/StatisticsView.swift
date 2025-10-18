@@ -22,8 +22,6 @@ struct StatisticsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                
-                // Header
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Estadísticas")
                         .font(.title.bold())
@@ -54,7 +52,6 @@ struct StatisticsView: View {
             }
             .padding(.vertical)
         }
-        .navigationTitle("Estadísticas")
         .task {
             await getNumsGraficas()
         }
@@ -99,11 +96,18 @@ struct StatisticsView: View {
             Chart(datosGraficas.por_estatus, id: \.estatus) { e in
                 SectorMark(
                     angle: .value("Porcentaje", e.porcentaje),
-                    innerRadius: .ratio(0.6)
+                    innerRadius: .ratio(0.6),
+                    angularInset: 1.5
                 )
                 .foregroundStyle(by: .value("Estatus", e.estatus))
+                .annotation(position: .overlay) {
+                    Text(String(format: "%.1f%%", e.porcentaje))
+                        .font(.caption.bold())
+                        .foregroundColor(.white)
+                }
             }
-            .frame(height: 250)
+            .chartLegend(position: .bottom, spacing: 20)
+            .frame(height: 300)
             .padding(.horizontal)
         }
         .padding(.vertical)
@@ -134,12 +138,25 @@ struct StatisticsView: View {
             }
             .padding(.horizontal)
             
+            let maxValue = datosGraficas.por_categoria.compactMap { Double($0.porcentaje) }.max() ?? 100
+            
             Chart(datosGraficas.por_categoria, id: \.titulo) { c in
                 BarMark(
                     x: .value("Categoria", c.titulo),
-                    y: .value("Porcentaje", Double(c.porcentaje) ?? 0)
+                    y: .value("Cantidad", Double(c.porcentaje) ?? 0)
                 )
                 .foregroundStyle(.blue.gradient)
+            }
+            .chartYScale(domain: 0...maxValue)
+            .chartYAxis {
+                AxisMarks(position: .leading, values: .automatic(desiredCount: 5)) { value in
+                    AxisGridLine()
+                    AxisValueLabel {
+                        if let intValue = value.as(Double.self) {
+                            Text("\(Int(intValue))")
+                        }
+                    }
+                }
             }
             .frame(height: 250)
             .padding(.horizontal)
@@ -168,12 +185,25 @@ struct StatisticsView: View {
             }
             .padding(.horizontal)
             
+            let maxValue = datosGraficas.metodos_contacto.compactMap { Double($0.porcentaje) }.max() ?? 100
+            
             Chart(datosGraficas.metodos_contacto, id: \.metodo) { m in
                 BarMark(
-                    x: .value("Porcentaje", Double(m.porcentaje) ?? 0),
+                    x: .value("Cantidad", Double(m.porcentaje) ?? 0),
                     y: .value("Metodo", m.metodo)
                 )
                 .foregroundStyle(.orange.gradient)
+            }
+            .chartXScale(domain: 0...maxValue)
+            .chartXAxis {
+                AxisMarks(position: .bottom, values: .automatic(desiredCount: 5)) { value in
+                    AxisGridLine()
+                    AxisValueLabel {
+                        if let intValue = value.as(Double.self) {
+                            Text("\(Int(intValue))")
+                        }
+                    }
+                }
             }
             .frame(height: 200)
             .padding(.horizontal)
@@ -209,8 +239,15 @@ struct StatisticsView: View {
                     angularInset: 2
                 )
                 .foregroundStyle(by: .value("Red Social", red.nombre))
+                .annotation(position: .overlay) {
+                    let porcentajeDouble = Double(red.porcentaje) ?? 0
+                    Text(String(format: "%.1f%%", porcentajeDouble))
+                        .font(.caption.bold())
+                        .foregroundColor(.white)
+                }
             }
-            .frame(height: 250)
+            .chartLegend(position: .bottom, spacing: 20)
+            .frame(height: 300)
             .padding(.horizontal)
         }
         .padding(.vertical)

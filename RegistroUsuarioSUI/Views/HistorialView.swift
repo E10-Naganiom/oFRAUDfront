@@ -27,23 +27,35 @@ struct HistorialView: View {
     }
     
     var body: some View {
-        NavigationStack {
+        ScrollView {
             VStack(alignment: .leading, spacing: 15) {
+                // Header - Fixed alignment
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Historial de reportes")
+                        .font(.title.bold())
+                    Text("Consulta el estado de tus reportes de incidentes")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+                
+                TextField("Buscar reportes por ID, categoria o titulo", text: $searchText)
+                    .padding(10)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
+                    .padding(.top, 5)
+                    .padding(.horizontal)
                 
                 HStack {
-                    Image(systemName:"document.fill")
-                    Text("Historial de reportes").font(.title2) .bold()
-                    Spacer()
-                }.padding()
-                Text("Consulta el estado de tus reportes de incidentes").font(.subheadline).foregroundColor(.gray).padding(.horizontal)
-                TextField("Buscar reportes por ID, categoria o titulo", text: $searchText)
-                    .padding(10).background(Color(.systemGray6)).cornerRadius(8).padding(.top, 5).padding(.horizontal)
-                HStack {
                     Picker("Filtrar por estatus", selection: $selectedStatus){
-                        ForEach(statusOptions, id: \.self){
-                            status in Text(status)
+                        ForEach(statusOptions, id: \.self){ status in
+                            Text(status)
                         }
-                    }.pickerStyle(MenuPickerStyle()).padding(.horizontal)
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .padding(.horizontal)
+                    
                     NavigationLink(destination: HistorialView()){
                         Text("Buscar")
                             .padding(.horizontal, 12)
@@ -51,12 +63,10 @@ struct HistorialView: View {
                             .background(Color.green)
                             .foregroundColor(.white)
                             .cornerRadius(8)
-                        
                     }
                 }
                 
-            }
-            ScrollView {
+                // Removed nested ScrollView - now just LazyVStack
                 LazyVStack(spacing: 12) {
                     if isLoading {
                         VStack {
@@ -74,6 +84,7 @@ struct HistorialView: View {
                         }
                     }
                 }
+                
                 VStack(alignment: .leading, spacing: 5){
                     Text("Resumen").font(.headline)
                     Text("Total de reportes: \(datosResumen.total_incidentes)")
@@ -81,12 +92,16 @@ struct HistorialView: View {
                     Text("Pendientes: \(datosResumen.total_pendientes)")
                     Text("Rechazados: \(datosResumen.total_rechazados)")
                 }
-                .padding().frame(maxWidth: .infinity, alignment: .leading).foregroundColor(.white).background(Color(.green)).cornerRadius(10).padding()
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .foregroundColor(.white)
+                .background(Color(.green))
+                .cornerRadius(10)
+                .padding()
             }
-            .navigationTitle("Mi Historial")
-            .task {
-                await cargarMiHistorial()
-            }
+        }
+        .task {
+            await cargarMiHistorial()
         }
     }
     

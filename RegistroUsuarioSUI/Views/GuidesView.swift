@@ -22,8 +22,8 @@ struct GuidesView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                
-                // Header
+                Text("Guías")
+                    .font(.title.bold())
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Image(systemName: "book.fill")
@@ -66,7 +66,6 @@ struct GuidesView: View {
             }
             .padding()
         }
-        .navigationTitle("Guías")
         .sheet(item: $selectedCategory) { category in
             CategoryDetailView(category: category, risk: riskDescriptions[category.id] ?? "N/A")
         }
