@@ -80,6 +80,83 @@ struct IncidentsClient {
         return response
     }
     
+    // ✨ NUEVA: Función para actualizar un incidente
+    func UpdateIncident(
+        id: Int,
+        titulo: String?,
+        id_categoria: Int?,
+        nombre_atacante: String?,
+        telefono: String?,
+        correo: String?,
+        user_red: String?,
+        red_social: String?,
+        descripcion: String?
+    ) async throws -> IncidentFormResponse {
+        
+        guard let token = TokenStorage.get(identifier: "accessToken") else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        let url = URL(string: "\(APIConfig.baseURL)/incidents/\(id)")!
+        var httpRequest = URLRequest(url: url)
+        httpRequest.httpMethod = "PUT"
+        
+        httpRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        let boundary = UUID().uuidString
+        httpRequest.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        var body = Data()
+        
+        // Agregar campos de texto (solo los que no son nil)
+        if let titulo = titulo {
+            addFormField(&body, name: "titulo", value: titulo, boundary: boundary)
+        }
+        if let id_categoria = id_categoria {
+            addFormField(&body, name: "id_categoria", value: String(id_categoria), boundary: boundary)
+        }
+        if let nombre_atacante = nombre_atacante {
+            addFormField(&body, name: "nombre_atacante", value: nombre_atacante, boundary: boundary)
+        }
+        if let telefono = telefono {
+            addFormField(&body, name: "telefono", value: telefono, boundary: boundary)
+        }
+        if let correo = correo {
+            addFormField(&body, name: "correo", value: correo, boundary: boundary)
+        }
+        if let user_red = user_red {
+            addFormField(&body, name: "user_red", value: user_red, boundary: boundary)
+        }
+        if let red_social = red_social {
+            addFormField(&body, name: "red_social", value: red_social, boundary: boundary)
+        }
+        if let descripcion = descripcion {
+            addFormField(&body, name: "descripcion", value: descripcion, boundary: boundary)
+        }
+        
+        // Cerrar boundary
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        
+        httpRequest.httpBody = body
+        
+        let (data, response) = try await URLSession.shared.data(for: httpRequest)
+        
+        // Verificar código de respuesta
+        if let httpResponse = response as? HTTPURLResponse {
+            print("Status code: \(httpResponse.statusCode)")
+            if httpResponse.statusCode != 200 {
+                throw URLError(.badServerResponse)
+            }
+        }
+        
+        if let jsonString = String(data: data, encoding: .utf8) {
+            print("Update response JSON: ", jsonString)
+        }
+        
+        let updatedIncident = try JSONDecoder().decode(IncidentFormResponse.self, from: data)
+        return updatedIncident
+    }
+    
     private func addFormField(_ body: inout Data, name: String, value: String, boundary: String) {
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"\(name)\"\r\n\r\n".data(using: .utf8)!)

@@ -22,6 +22,20 @@ struct IncidentFormRequest: Codable {
     var es_anonimo: Bool
 }
 
+// ✨ NUEVO: DTO para actualización de incidentes
+struct UpdateIncidentRequest: Codable {
+    var titulo: String?
+    var id_categoria: Int?
+    var nombre_atacante: String?
+    var telefono: String?
+    var correo: String?
+    var user_red: String?
+    var red_social: String?
+    var descripcion: String?
+    var supervisor: Int?
+    var id_estatus: Int?
+}
+
 struct IncidentFormResponse: Codable, Identifiable {
     let id: Int
     let titulo: String
