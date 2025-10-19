@@ -5,13 +5,10 @@
 //  Created by Usuario on 23/09/25.
 //
 
-
 import SwiftUI
 import PhotosUI
 import UIKit
-
-
-
+import AVFoundation
 
 struct ReportView: View {
     
@@ -21,14 +18,12 @@ struct ReportView: View {
     @State private var idCategoria = 0
     @State private var tipoIncidente = "Phishing"
     @State private var atacante = ""
-//    @State private var fechaIncidente = Date()
     @State private var es_anonimo = false
     
     @State private var currentUserId: Int? = nil
     
     @State private var contactos: [MetodoContacto] = []
     @State private var descripcion = ""
-
 
     @State private var showSuccessAlert = false
     @State private var navigateToDashboard = false
@@ -70,22 +65,8 @@ struct ReportView: View {
                     }
                     .pickerStyle(MenuPickerStyle())
                 }
-//                TextField("Id categoria", value: $idCategoria, format: .number)
-                
-//                Picker("Tipo de incidente", selection: $tipoIncidente) {
-//                    ForEach(categorias, id: \.self) { cat in
-//                        Text(cat)
-//                    }
-//                }
                 
                 TextField("Empresa o individuo atacante", text: $atacante)
-                
-//                DatePicker(
-//                    "Fecha del incidente",
-//                    selection: $fechaIncidente,
-//                    in: ...Date(),
-//                    displayedComponents: [.date]
-//                )
             }
             
             // Métodos de contacto
@@ -164,12 +145,24 @@ struct ReportView: View {
                 }
             }
             
+            // Botones de cámara y carrete
             Section {
                 HStack(spacing:12){
                     Button {
-                        showCamera = true
+                        checkCameraPermission { granted in
+                            if granted {
+                                showCamera = true
+                            } else {
+                                // Alerta simple si el usuario deniega la cámara
+                                print("Permiso de cámara denegado")
+                            }
+                        }
                     } label: {
-                        Label("Usar Camara", systemImage: "camera.fill").frame(maxWidth: .infinity)
+                        HStack {
+                            Image(systemName: "camera.fill")
+                            Text("Cámara")
+                        }
+                        .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))
@@ -188,12 +181,10 @@ struct ReportView: View {
                             }
                         }
                     }
-                    
-
-
                 }
             }
             
+            // Toggle de anonimato
             Section{
                 HStack{
                     Text("Desea que su reporte sea anonimo?")
@@ -201,9 +192,10 @@ struct ReportView: View {
                     Toggle("", isOn: $es_anonimo)
                 }
             }
+            
             // Nota importante
             Section {
-                Text("⚠️ Importante: No compartas información personal o sensible en este formulario. Solo incluye detalles relevantes del incidente.")
+                Text("Importante: No compartas información personal o sensible en este formulario. Solo incluye detalles relevantes del incidente.")
                     .font(.footnote)
                     .foregroundColor(.red)
             }
@@ -235,6 +227,15 @@ struct ReportView: View {
             }
         }
         .navigationTitle("Levantar Reporte")
+        .fullScreenCover(isPresented: $showCamera) {
+            ImagePicker(sourceType: .camera) { image in
+                if let imageData = image.jpegData(compressionQuality: 0.8) {
+                    if archivosAdjuntos.count < 5 {
+                        archivosAdjuntos.append(imageData)
+                    }
+                }
+            }
+        }
         .task {
             do {
                 categories = try await categoriesController.getAllCategories()
@@ -256,7 +257,7 @@ struct ReportView: View {
     func enviarReporte() async {
         do {
             guard let currentUserId = currentUserId else {
-                print("❌ No hay usuario autenticado")
+                print("No hay usuario autenticado")
                 return
             }
             
@@ -277,30 +278,33 @@ struct ReportView: View {
                 evidences: archivosAdjuntos
             )
 
-            print("✅ Respuesta completa:", response)
+            print("Respuesta completa:", response)
             await MainActor.run {
                 showSuccessAlert = true
             }
 
         } catch {
-            print("⚠️ Error completo:", error)
-            print("⚠️ Descripción:", error.localizedDescription)
+            print("Error completo:", error)
+            print("Descripción:", error.localizedDescription)
         }
     }
-
-
-
-
-
-
-
-
-
-
+    
+    // MARK: - Función de permisos de cámara
+    func checkCameraPermission(completion: @escaping (Bool) -> Void) {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            completion(true)
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                DispatchQueue.main.async {
+                    completion(granted)
+                }
+            }
+        default:
+            completion(false)
+        }
+    }
 }
-
-
-
 
 // MARK: - Modelo de método de contacto
 struct MetodoContacto: Identifiable {
@@ -310,14 +314,48 @@ struct MetodoContacto: Identifiable {
     var redSocial: String = "Twitter/X"
 }
 
-
-
+// MARK: - ImagePicker para UIImagePickerController
+struct ImagePicker: UIViewControllerRepresentable {
+    var sourceType: UIImagePickerController.SourceType
+    var onImagePicked: (UIImage) -> Void
+    
+    @Environment(\.dismiss) var dismiss
+    
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.sourceType = sourceType
+        picker.delegate = context.coordinator
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        let parent: ImagePicker
+        
+        init(_ parent: ImagePicker) {
+            self.parent = parent
+        }
+        
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let image = info[.originalImage] as? UIImage {
+                parent.onImagePicked(image)
+            }
+            parent.dismiss()
+        }
+        
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.dismiss()
+        }
+    }
+}
 
 #Preview {
     NavigationStack {
         ReportView()
     }
 }
-
-
-

@@ -13,70 +13,236 @@ struct PrivacyPolicyView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 16) {
                     
                     // Encabezado
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Política de Privacidad - oFraud")
-                            .font(.title2.bold())
-                        Text("Red por la Ciberseguridad")
+                        Text("Aviso de Privacidad")
+                            .font(.title.bold())
+                        Text("oFraud - Red por la Ciberseguridad")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
-                        Text("Última actualización: Octubre 2025")
+                        Text("Última actualización: 30/11/2023")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                     .padding(.bottom, 10)
                     
                     Group {
-                        Text("**1. Introducción**")
-                        Text("En oFraud (\"nosotros\", \"nuestro\" o \"la Organización\"), nos comprometemos con la protección de tu privacidad y datos personales. Esta Política de Privacidad explica cómo recopilamos, usamos, compartimos y protegemos tu información cuando utilizas nuestra plataforma de reportes de incidentes de ciberseguridad.")
+                        Text("Causas para la Transformación A.C., mejor conocido como Red por la Ciberseguridad, con domicilio en calle Retorno al Ruiseñor 12, colonia Mayorazgos del Bosque, ciudad Atizapán de Zaragoza, municipio o delegación Atizapán de Zaragoza, c.p. 52957, en la entidad de México, país México, y portal de internet www.redporlaciberseguridad.org, es el responsable del uso y protección de sus datos personales.")
+                            .fixedSize(horizontal: false, vertical: true)
                         
-                        Text("**2. Información que Recopilamos**")
-                        Text("2.1 **Información de Registro**\n- Nombre completo\n- Apellido\n- Correo electrónico\n- Contraseña (encriptada)\n- Información de verificación de identidad\n\n2.2 **Información de Reportes**\nCuando levantas un reporte de incidente, recopilamos:\n- Título y descripción del incidente\n- Categoría del incidente\n- Información de contacto (teléfono, correo, usuario de redes sociales)\n- Nombre del presunto atacante\n- Red social involucrada\n- Archivos adjuntos como evidencia (fotos, documentos)\n- Fecha y hora del reporte\n\n2.3 **Información Técnica**\n- Dirección IP\n- Tipo de dispositivo y sistema operativo\n- Historial de navegación dentro de la plataforma\n- Cookies y datos de sesión\n\n2.4 **Información Voluntaria**\n- Cualquier información adicional que proporciones en encuestas, comentarios o consultas de soporte.")
+                        Divider().padding(.vertical, 8)
                         
-                        Text("**3. Cómo Usamos tu Información**")
-                        Text("Utilizamos los datos que recopilas para:\n- Procesar y investigar reportes de ciberseguridad\n- Mejorar la respuesta ante incidentes\n- Prevenir fraudes y abusos en la plataforma\n- Personalizar tu experiencia en oFraud\n- Enviar notificaciones sobre el estado de tu reporte\n- Cumplir con obligaciones legales y regulatorias\n- Analizar tendencias de ciberseguridad en México\n- Mejorar nuestros servicios y la plataforma\n- Contactarte con información relevante sobre seguridad digital")
+                        Text("¿Para qué fines utilizaremos sus datos personales?")
+                            .font(.headline)
+                            .padding(.top, 4)
                         
-                        Text("**4. Base Legal para el Tratamiento de Datos**")
-                        Text("El tratamiento de tus datos se realiza con base en:\n- Tu consentimiento explícito (al registrarte y aceptar esta política)\n- La ejecución de nuestro acuerdo de servicios\n- Intereses legítimos en proteger la ciberseguridad\n- Cumplimiento de obligaciones legales")
+                        Text("Los datos personales que recabamos de usted, los utilizaremos para las siguientes finalidades que son necesarias para el servicio que solicita:")
                         
-                        Text("**5. Compartición de Información**")
-                        Text("Tu información NO será compartida con terceros sin tu consentimiento, excepto:\n- **Autoridades competentes:** Si lo requiere la ley o una orden judicial\n- **Personal de investigación:** Miembros de oFraud que investigan tu reporte\n- **Proveedores de servicios:** Que procesan datos bajo contrato (hosting, correo)\n- **Organismos de ciberseguridad:** En caso de amenazas críticas a la seguridad nacional\n\nEn ningún caso vendemos o alquilamos información personal a terceros para marketing.")
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("Procesamiento de reportes de incidentes de ciberseguridad", systemImage: "checkmark.circle.fill")
+                            Label("Investigación y análisis de incidentes reportados", systemImage: "checkmark.circle.fill")
+                            Label("Envío de notificaciones sobre el estado de su reporte", systemImage: "checkmark.circle.fill")
+                            Label("Contacto para seguimiento de casos", systemImage: "checkmark.circle.fill")
+                        }
+                        .font(.callout)
+                        .foregroundColor(.primary)
                         
-                        Text("**6. Retención de Datos**")
-                        Text("• Reportes: Se mantienen durante 5 años o mientras sea necesario para investigación\n• Datos de cuenta: Se retienen mientras mantengas tu cuenta activa\n• Datos técnicos: Se eliminan después de 12 meses\n• Información de contacto: Puedes solicitar su eliminación en cualquier momento")
+                        Text("De manera adicional, utilizaremos su información personal para las siguientes finalidades secundarias que no son necesarias para el servicio solicitado, pero que nos permiten y facilitan brindarle una mejor atención:")
+                            .padding(.top, 8)
                         
-                        Text("**7. Protección de Datos**")
-                        Text("Implementamos medidas de seguridad técnicas y organizativas:\n- Encriptación SSL/TLS para transmisión de datos\n- Contraseñas encriptadas con algoritmos seguros\n- Acceso restringido a información sensible\n- Auditorías de seguridad regulares\n- Política de retención de datos mínimos necesarios\n\nSin embargo, ningún sistema es 100% seguro. No podemos garantizar seguridad absoluta.")
+                        VStack(alignment: .leading, spacing: 6) {
+                            Label("Análisis estadístico de tendencias de ciberseguridad", systemImage: "chart.bar.fill")
+                            Label("Mejora de servicios y funcionalidades de la plataforma", systemImage: "chart.bar.fill")
+                            Label("Envío de información sobre programas de la organización", systemImage: "chart.bar.fill")
+                            Label("Registros estadísticos de uso de la plataforma", systemImage: "chart.bar.fill")
+                        }
+                        .font(.callout)
+                        .foregroundColor(.secondary)
                         
-                        Text("**8. Tus Derechos**")
-                        Text("Bajo la legislación mexicana (Ley Federal de Protección de Datos Personales), tienes derecho a:\n- **Acceso:** Conocer qué datos personales tenemos de ti\n- **Rectificación:** Corregir información inexacta\n- **Cancelación:** Solicitar la eliminación de tus datos\n- **Oposición:** Rechazar ciertos usos de tu información\n- **Portabilidad:** Recibir tus datos en formato legible\n\nPara ejercer estos derechos, contacta a: **privacidad@oFraud.org**")
+                        Text("La negativa para el uso de sus datos personales para estas finalidades secundarias no podrá ser un motivo para que le neguemos los servicios que solicita o contrata con nosotros.")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                            .padding(.vertical, 8)
                         
-                        Text("**9. Reporte de Incidentes de Privacidad**")
-                        Text("Si detectas un uso indebido de tus datos personales, reporta inmediatamente a:\n**Centro de Derechos Digitales y Ciberseguridad**\nEmail: **incidentes@oFraud.org**\nTeléfono: **(52) 55 1234 6789**")
+                        Divider().padding(.vertical, 8)
                         
-                        Text("**10. Reportes Anónimos**")
-                        Text("oFraud respeta tu privacidad. Puedes:\n- Marcar tu reporte como \"anónimo\" durante el registro\n- Tu nombre no aparecerá en el reporte público\n- Solo nuestro equipo de investigación verá tu identidad si es necesario para contactarte")
+                        Text("¿Qué datos personales utilizaremos para estos fines?")
+                            .font(.headline)
+                            .padding(.top, 4)
                         
-                        Text("**11. Cambios en esta Política**")
-                        Text("oFraud puede actualizar esta Política de Privacidad ocasionalmente. Te notificaremos sobre cambios significativos por email o un aviso destacado en la plataforma.")
+                        Text("Para llevar a cabo las finalidades descritas en el presente aviso de privacidad, utilizaremos los siguientes datos personales:")
                         
-                        Text("**12. Contacto**")
-                        Text("Si tienes preguntas sobre esta Política de Privacidad o nuestras prácticas de datos:\n**Red por la Ciberseguridad**\nEmail: **privacidad@oFraud.org**\nTeléfono: **(52) 55 1234 6789**\nWeb: **https://oFraud.org/privacidad**\nHorario: **Lunes a Viernes, 9:00 AM - 6:00 PM**")
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("• Datos de identificación (nombre completo)")
+                            Text("• Datos de contacto (correo electrónico, teléfono)")
+                            Text("• Datos del incidente (título, descripción, categoría)")
+                            Text("• Información del atacante (nombre, red social involucrada)")
+                            Text("• Evidencias (fotografías, documentos adjuntos)")
+                            Text("• Datos técnicos (dirección IP, tipo de dispositivo)")
+                        }
+                        .font(.callout)
+                        .foregroundColor(.primary)
                         
-                        Text("**Aceptación de la Política**")
-                        Text("Al usar oFraud, aceptas el tratamiento de tus datos personales conforme a esta Política de Privacidad. Si no estás de acuerdo, por favor no utilices la plataforma.")
+                        Divider().padding(.vertical, 8)
                         
-                        Text("**Aviso de Cumplimiento Normativo**")
-                        Text("Esta política cumple con:\n- Ley Federal de Protección de Datos Personales en Posesión de Particulares (México)\n- NOM-086-SCFI-2016\n- Estándares internacionales de privacidad de datos")
+                        Text("¿Con quién compartimos su información personal y para qué fines?")
+                            .font(.headline)
+                            .padding(.top, 4)
+                        
+                        Text("Le informamos que sus datos personales son compartidos dentro y fuera del país con las siguientes personas, empresas, organizaciones o autoridades distintas a nosotros, para los siguientes fines:")
+                        
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack(alignment: .top) {
+                                Image(systemName: "building.2")
+                                    .foregroundColor(.blue)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales")
+                                        .font(.callout.bold())
+                                    Text("Finalidad: Estadísticas")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    Text("Requiere consentimiento: No")
+                                        .font(.caption)
+                                        .foregroundColor(.green)
+                                }
+                            }
+                            
+                            HStack(alignment: .top) {
+                                Image(systemName: "server.rack")
+                                    .foregroundColor(.blue)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Microsoft")
+                                        .font(.callout.bold())
+                                    Text("Finalidad: Estadísticas y servicios de infraestructura")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    Text("Requiere consentimiento: No")
+                                        .font(.caption)
+                                        .foregroundColor(.green)
+                                }
+                            }
+                            
+                            HStack(alignment: .top) {
+                                Image(systemName: "server.rack")
+                                    .foregroundColor(.blue)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Amazon Web Services")
+                                        .font(.callout.bold())
+                                    Text("Finalidad: Almacenamiento y estadísticas")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    Text("Requiere consentimiento: No")
+                                        .font(.caption)
+                                        .foregroundColor(.green)
+                                }
+                            }
+                        }
+                        .padding(.vertical, 8)
+                        
+                        Divider().padding(.vertical, 8)
+                        
+                        Text("¿Cómo puede acceder, rectificar o cancelar sus datos personales, u oponerse a su uso?")
+                            .font(.headline)
+                            .padding(.top, 4)
+                        
+                        Text("Usted tiene derecho a conocer qué datos personales tenemos de usted, para qué los utilizamos y las condiciones del uso que les damos (Acceso). Asimismo, es su derecho solicitar la corrección de su información personal en caso de que esté desactualizada, sea inexacta o incompleta (Rectificación); que la eliminemos de nuestros registros o bases de datos cuando considere que la misma no está siendo utilizada adecuadamente (Cancelación); así como oponerse al uso de sus datos personales para fines específicos (Oposición). Estos derechos se conocen como derechos ARCO.")
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Image(systemName: "person.crop.circle.badge.checkmark")
+                                    .foregroundColor(.green)
+                                Text("Responsable: Oscar Ortega")
+                                    .font(.callout.bold())
+                            }
+                            
+                            HStack {
+                                Image(systemName: "mappin.circle")
+                                    .foregroundColor(.green)
+                                VStack(alignment: .leading) {
+                                    Text("Domicilio:")
+                                        .font(.caption.bold())
+                                    Text("Retorno Ruiseñor 12, Mayorazgos del Bosque")
+                                        .font(.caption)
+                                    Text("Atizapán de Zaragoza, México, C.P. 52957")
+                                        .font(.caption)
+                                }
+                            }
+                            
+                            HStack {
+                                Image(systemName: "envelope.circle")
+                                    .foregroundColor(.green)
+                                Text("ayuda@redporlaciberseguridad.org")
+                                    .font(.callout)
+                            }
+                        }
+                        .padding(.vertical, 8)
+                        
+                        Divider().padding(.vertical, 8)
+                        
+                        Text("Usted puede revocar su consentimiento para el uso de sus datos personales")
+                            .font(.headline)
+                            .padding(.top, 4)
+                        
+                        Text("Usted puede revocar el consentimiento que, en su caso, nos haya otorgado para el tratamiento de sus datos personales. Sin embargo, es importante que tenga en cuenta que no en todos los casos podremos atender su solicitud o concluir el uso de forma inmediata, ya que es posible que por alguna obligación legal requiramos seguir tratando sus datos personales.")
+                        
+                        Text("Para revocar su consentimiento, deberá presentar su solicitud a través del correo electrónico: ayuda@redporlaciberseguridad.org")
+                            .padding(.vertical, 8)
+                            .font(.callout)
+                        
+                        Divider().padding(.vertical, 8)
+                        
+                        Text("Uso de tecnologías de rastreo")
+                            .font(.headline)
+                            .padding(.top, 4)
+                        
+                        Text("Le informamos que en nuestra plataforma utilizamos cookies, web beacons u otras tecnologías, a través de las cuales es posible monitorear su comportamiento como usuario, así como brindarle un mejor servicio y experiencia al navegar.")
+                        
+                        Text("Los datos personales que obtenemos de estas tecnologías incluyen:")
+                            .padding(.top, 8)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("• Identificadores y credenciales de sesión")
+                            Text("• Tipo de navegador y sistema operativo")
+                            Text("• Región del usuario")
+                            Text("• Páginas visitadas dentro de la plataforma")
+                            Text("• Fecha y hora de inicio y final de sesión")
+                        }
+                        .font(.callout)
+                        .foregroundColor(.primary)
+                        
+                        Divider().padding(.vertical, 8)
+                        
+                        Text("¿Cómo puede conocer los cambios en este aviso de privacidad?")
+                            .font(.headline)
+                            .padding(.top, 4)
+                        
+                        Text("El presente aviso de privacidad puede sufrir modificaciones, cambios o actualizaciones derivadas de nuevos requerimientos legales; de nuestras propias necesidades por los productos o servicios que ofrecemos; de nuestras prácticas de privacidad; de cambios en nuestro modelo de negocio, o por otras causas.")
+                        
+                        Text("Nos comprometemos a mantenerlo informado sobre los cambios que pueda sufrir el presente aviso de privacidad, a través de nuestra página web y notificaciones dentro de la plataforma.")
+                            .padding(.vertical, 8)
+                        
+                        Divider().padding(.vertical, 8)
+                        
+                        Text("Reportes Anónimos")
+                            .font(.headline)
+                            .padding(.top, 4)
+                        
+                        Text("oFraud respeta su derecho a la privacidad. Si marca su reporte como \"anónimo\", su nombre no aparecerá en el reporte público. Solo nuestro equipo de investigación autorizado tendrá acceso a su identidad en caso de ser necesario contactarle para el seguimiento del caso.")
+                        
+                        Text("**Aceptación del Aviso**")
+                            .font(.headline)
+                            .padding(.top, 8)
+                        
+                        Text("Al usar oFraud, usted acepta el tratamiento de sus datos personales conforme a este Aviso de Privacidad. Si no está de acuerdo, por favor no utilice la plataforma.")
+                            .foregroundColor(.red)
                     }
                     .font(.callout)
-                    .foregroundColor(.primary)
                 }
                 .padding()
             }
-            .navigationTitle("Política de Privacidad")
+            .navigationTitle("Aviso de Privacidad")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -90,4 +256,6 @@ struct PrivacyPolicyView: View {
     }
 }
 
-
+#Preview {
+    PrivacyPolicyView(isPresented: .constant(true))
+}

@@ -19,13 +19,16 @@ struct IncidentDetailView: View {
     @State private var editedIncident: EditableIncident
     @State private var showUpdateSuccess = false
     
-    // ✨ NUEVOS: Estados para manejo de actualización
+    // Estados para manejo de actualización
     @State private var showUpdateError = false
     @State private var errorMessage = ""
     @State private var isUpdating = false
     @State private var updatedIncidentData: IncidentFormResponse?
     
-    // ✨ NUEVO: Environment para cerrar la vista después de actualizar (opcional)
+    // ✨ NUEVO: Estados para vista de imagen en pantalla completa
+    @State private var selectedImageURL: URL?
+    @State private var showFullScreenImage = false
+    
     @Environment(\.dismiss) private var dismiss
     
     init(incidente: IncidentFormResponse, categories: [CategoryFormResponse], estatus: String, nombreCompleto: String) {
@@ -36,7 +39,6 @@ struct IncidentDetailView: View {
         _editedIncident = State(initialValue: EditableIncident(from: incidente))
     }
     
-    // ✨ MODIFICADO: Usar datos actualizados si existen, sino los originales
     private var currentIncident: IncidentFormResponse {
         updatedIncidentData ?? incidente
     }
@@ -293,7 +295,7 @@ struct IncidentDetailView: View {
                 .cornerRadius(16)
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                 
-                // ✨ MODIFICADO: Botón guardar con loading state
+                // Botón guardar con loading state
                 if isEditing && currentIncident.id_estatus == 1 {
                     Button(action: {
                         Task {
@@ -319,7 +321,7 @@ struct IncidentDetailView: View {
                     .disabled(isUpdating)
                 }
                 
-                // Evidencias (no editables por ahora)
+                // ✨ MODIFICADO: Evidencias con click para ver en pantalla completa
                 if let evidencias = currentIncident.evidencias, !evidencias.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Evidencias")
@@ -347,6 +349,10 @@ struct IncidentDetailView: View {
                                                 .clipped()
                                                 .cornerRadius(12)
                                                 .shadow(radius: 2)
+                                                .onTapGesture {
+                                                    selectedImageURL = url
+                                                    showFullScreenImage = true
+                                                }
                                         case .failure:
                                             Image(systemName: "xmark.circle")
                                                 .resizable()
@@ -389,7 +395,6 @@ struct IncidentDetailView: View {
         }
         .navigationTitle("Incidente")
         .navigationBarTitleDisplayMode(.inline)
-        // ✨ MODIFICADO: Alert de éxito con mejor mensaje
         .alert("✅ Incidente actualizado", isPresented: $showUpdateSuccess) {
             Button("OK", role: .cancel) {
                 isEditing = false
@@ -397,11 +402,16 @@ struct IncidentDetailView: View {
         } message: {
             Text("Los cambios se guardaron correctamente")
         }
-        // ✨ NUEVO: Alert de error
         .alert("❌ Error al actualizar", isPresented: $showUpdateError) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(errorMessage)
+        }
+        // ✨ NUEVO: Vista de imagen en pantalla completa
+        .fullScreenCover(isPresented: $showFullScreenImage) {
+            if let imageURL = selectedImageURL {
+                FullScreenImageFromURLView(imageURL: imageURL, isPresented: $showFullScreenImage)
+            }
         }
     }
     
@@ -414,7 +424,6 @@ struct IncidentDetailView: View {
         return "No especificada"
     }
     
-    // ✨ MODIFICADA: Función updateIncident completa con refresh
     private func updateIncident() async {
         isUpdating = true
         defer { isUpdating = false }
@@ -422,7 +431,6 @@ struct IncidentDetailView: View {
         let incidentsController = IncidentsController(incidensClient: IncidentsClient())
         
         do {
-            // Llamar al endpoint de actualización
             let updatedIncident = try await incidentsController.updateIncident(
                 id: incidente.id,
                 titulo: editedIncident.titulo,
@@ -435,17 +443,14 @@ struct IncidentDetailView: View {
                 descripcion: editedIncident.descripcion
             )
             
-            // ✨ Actualizar los datos locales con la respuesta del servidor
             updatedIncidentData = updatedIncident
-            
-            // ✨ Actualizar editedIncident para reflejar los cambios
             editedIncident = EditableIncident(from: updatedIncident)
             
-            print("✅ Incidente actualizado exitosamente: \(updatedIncident)")
+            print("Incidente actualizado exitosamente: \(updatedIncident)")
             showUpdateSuccess = true
             
         } catch {
-            print("❌ Error al actualizar incidente: \(error)")
+            print("Error al actualizar incidente: \(error)")
             errorMessage = "No se pudo actualizar el incidente. Por favor intenta de nuevo."
             showUpdateError = true
         }
@@ -472,5 +477,142 @@ struct EditableIncident {
         self.user_red = incident.user_red
         self.red_social = incident.red_social
         self.descripcion = incident.descripcion
+    }
+}
+
+struct FullScreenImageFromURLView: View {
+    let imageURL: URL
+    @Binding var isPresented: Bool
+    @State private var scale: CGFloat = 1.0
+    @State private var lastScale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
+    
+    var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Botón de cerrar
+                HStack {
+                    Spacer()
+                    Button {
+                        isPresented = false
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 30))
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.black.opacity(0.5))
+                            .clipShape(Circle())
+                    }
+                    .padding()
+                }
+                .zIndex(1)
+                
+                // Imagen
+                ZStack {
+                    AsyncImage(url: imageURL) { phase in
+                        switch phase {
+                        case .empty:
+                            VStack(spacing: 16) {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .scaleEffect(2)
+                                Text("Cargando imagen...")
+                                    .foregroundColor(.white)
+                                    .font(.caption)
+                            }
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .scaleEffect(scale)
+                                .offset(offset)
+                                .gesture(
+                                    MagnificationGesture()
+                                        .onChanged { value in
+                                            let delta = value / lastScale
+                                            lastScale = value
+                                            scale = min(max(scale * delta, 1.0), 5.0)
+                                        }
+                                        .onEnded { _ in
+                                            lastScale = 1.0
+                                            if scale < 1.0 {
+                                                withAnimation(.spring()) {
+                                                    scale = 1.0
+                                                    offset = .zero
+                                                }
+                                            }
+                                        }
+                                )
+                                .gesture(
+                                    DragGesture()
+                                        .onChanged { value in
+                                            if scale > 1.0 {
+                                                offset = CGSize(
+                                                    width: lastOffset.width + value.translation.width,
+                                                    height: lastOffset.height + value.translation.height
+                                                )
+                                            }
+                                        }
+                                        .onEnded { _ in
+                                            lastOffset = offset
+                                        }
+                                )
+                                .gesture(
+                                    TapGesture(count: 2)
+                                        .onEnded {
+                                            withAnimation(.spring()) {
+                                                if scale > 1.0 {
+                                                    scale = 1.0
+                                                    offset = .zero
+                                                    lastOffset = .zero
+                                                } else {
+                                                    scale = 2.5
+                                                }
+                                            }
+                                        }
+                                )
+                        case .failure(let error):
+                            VStack(spacing: 16) {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.system(size: 60))
+                                    .foregroundColor(.red)
+                                Text("Error al cargar la imagen")
+                                    .foregroundColor(.white)
+                                    .font(.headline)
+                                Text(error.localizedDescription)
+                                    .foregroundColor(.white.opacity(0.7))
+                                    .font(.caption)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
+                                Text("URL: \(imageURL.absoluteString)")
+                                    .foregroundColor(.white.opacity(0.5))
+                                    .font(.caption2)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
+                            }
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+                // Indicador de zoom
+                if scale > 1.0 {
+                    Text(String(format: "%.1fx", scale))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.black.opacity(0.6))
+                        .cornerRadius(20)
+                        .padding(.bottom, 20)
+                }
+            }
+        }
+        .statusBar(hidden: true)
     }
 }

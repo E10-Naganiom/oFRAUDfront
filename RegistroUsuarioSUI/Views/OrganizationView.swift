@@ -88,15 +88,14 @@ struct OrganizationView: View {
                             VStack(alignment: .leading) {
                                 Text("Teléfono")
                                     .font(.subheadline.bold())
-                                Text("Disponible Lu-Vi 09-21 hrs")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                Text("(+52) 55 1234 6789")
+                                Text("(656) 4990493")
                                     .font(.subheadline)
                             }
                             Spacer()
                             Button("Llamar") {
-                                // llamar
+                                if let url = URL(string: "tel:6564990493") {
+                                    UIApplication.shared.open(url)
+                                }
                             }
                             .font(.caption.bold())
                             .foregroundColor(.green)
@@ -116,49 +115,22 @@ struct OrganizationView: View {
                             VStack(alignment: .leading) {
                                 Text("Correo Electrónico")
                                     .font(.subheadline.bold())
-                                Text("Respuesta menor a 24 horas")
+                                Text("contacto@redporlaciberseguridad.org")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
-                                Text("contacto@oFraud.org")
-                                    .font(.subheadline)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
                             }
                             Spacer()
                             Button("Enviar Email") {
-                                // email
+                                if let url = URL(string: "mailto:contacto@redporlaciberseguridad.org") {
+                                    UIApplication.shared.open(url)
+                                }
                             }
                             .font(.caption.bold())
                             .foregroundColor(.blue)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
                             .background(Color.blue.opacity(0.1))
-                            .cornerRadius(8)
-                        }
-                        .padding()
-                        .background(Color(.systemGray5))
-                        .cornerRadius(12)
-                        
-                        HStack {
-                            Image(systemName: "message.fill")
-                                .foregroundColor(.green)
-                                .frame(width: 24)
-                            VStack(alignment: .leading) {
-                                Text("Chat en Vivo")
-                                    .font(.subheadline.bold())
-                                Text("Lunes a Viernes, 9:00 AM - 6:00 PM")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                Text("chat.cyberseguridad.org")
-                                    .font(.subheadline)
-                            }
-                            Spacer()
-                            Button("Abrir Chat") {
-                                // abrir chat
-                            }
-                            .font(.caption.bold())
-                            .foregroundColor(.green)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.green.opacity(0.1))
                             .cornerRadius(8)
                         }
                         .padding()
@@ -172,15 +144,16 @@ struct OrganizationView: View {
                             VStack(alignment: .leading) {
                                 Text("Página Web")
                                     .font(.subheadline.bold())
-                                Text("Para más recursos")
+                                Text("redporlaciberseguridad.org")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
-                                Text("https://oFraud.org/")
-                                    .font(.subheadline)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
                             }
                             Spacer()
                             Button("Visitar Sitio") {
-                                // visitar sitio
+                                if let url = URL(string: "https://redporlaciberseguridad.org") {
+                                    UIApplication.shared.open(url)
+                                }
                             }
                             .font(.caption.bold())
                             .foregroundColor(.blue)
@@ -192,93 +165,6 @@ struct OrganizationView: View {
                         .padding()
                         .background(Color(.systemGray5))
                         .cornerRadius(12)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(16)
-                
-                // Ubicación
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Image(systemName: "location.fill")
-                            .foregroundColor(.green)
-                        Text("Ubicación")
-                            .font(.headline)
-                    }
-                    HStack{
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Tec de Monterrey")
-                                .font(.subheadline)
-                            Text("Campus Ciudad de México")
-                                .font(.subheadline)
-                            Button("Ver en Mapa") {
-                                let coordinate = CLLocationCoordinate2D(latitude: 19.2840617, longitude: -99.1361044)
-                                let placemark = MKPlacemark(coordinate: coordinate)
-                                let mapItem = MKMapItem(placemark: placemark)
-                                mapItem.name = "Tec de Monterrey - Campus Ciudad de México"
-                                mapItem.openInMaps()
-                            }
-                            .foregroundColor(.green)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(Color.green.opacity(0.1))
-                            .cornerRadius(8)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                        Map(position: $position) {
-                            Marker("Tec de Monterrey", coordinate: CLLocationCoordinate2D(latitude: 19.2426, longitude: -99.1375))
-                                .tint(.green)
-                        }
-                        .disabled(true)
-                        .frame(height: 120)
-                        .cornerRadius(8)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                        )
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(16)
-                
-                // Equipo
-                VStack(alignment: .leading, spacing: 16) {
-                    HStack {
-                        Image(systemName: "person.2.fill")
-                            .foregroundColor(.green)
-                        Text("Nuestro Equipo")
-                            .font(.headline)
-                    }
-                    
-                    Text("Expertos dedicados a tu seguridad digital")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    
-                    VStack(spacing: 12) {
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text("Dr. Santiago Niño")
-                                    .font(.subheadline.bold())
-                                Text("Presidente")
-                                    .font(.caption)
-                                    .foregroundColor(.green)
-                                Text("Análisis de Amenazas")
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
-                            Text("15 años")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding()
-                        .background(Color(.systemGray5))
-                        .cornerRadius(8)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -379,17 +265,8 @@ struct OrganizationView: View {
                             .font(.headline)
                     }
                     
-                    Button("Política de Privacidad") {
-                        showPrivacyPolicy = true //
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color(.systemGray5))
-                    .foregroundColor(.primary)
-                    .cornerRadius(8)
-                    
-                    Button("Términos y Condiciones") {
-                        // terminos
+                    Button("Política de Privacidad, Términos y Condiciones") {
+                        showPrivacyPolicy = true
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -410,7 +287,6 @@ struct OrganizationView: View {
             .padding()
         }
         .navigationTitle("Sobre Nosotros")
-        // 👇 Presenta la misma vista de políticas
         .sheet(isPresented: $showPrivacyPolicy) {
             PrivacyPolicyView(isPresented: $showPrivacyPolicy)
                 .presentationDetents([.medium, .large])

@@ -138,22 +138,27 @@ struct StatisticsView: View {
             }
             .padding(.horizontal)
             
-            let maxValue = datosGraficas.por_categoria.compactMap { Double($0.porcentaje) }.max() ?? 100
+            let maxValue = datosGraficas.por_categoria.map { $0.total }.max() ?? 100
             
             Chart(datosGraficas.por_categoria, id: \.titulo) { c in
                 BarMark(
                     x: .value("Categoria", c.titulo),
-                    y: .value("Cantidad", Double(c.porcentaje) ?? 0)
+                    y: .value("Cantidad", c.total)
                 )
                 .foregroundStyle(.blue.gradient)
+                .annotation(position: .top) {
+                    Text("\(c.total)")
+                        .font(.caption.bold())
+                        .foregroundColor(.blue)
+                }
             }
             .chartYScale(domain: 0...maxValue)
             .chartYAxis {
                 AxisMarks(position: .leading, values: .automatic(desiredCount: 5)) { value in
                     AxisGridLine()
                     AxisValueLabel {
-                        if let intValue = value.as(Double.self) {
-                            Text("\(Int(intValue))")
+                        if let intValue = value.as(Int.self) {
+                            Text("\(intValue)")
                         }
                     }
                 }
@@ -185,22 +190,27 @@ struct StatisticsView: View {
             }
             .padding(.horizontal)
             
-            let maxValue = datosGraficas.metodos_contacto.compactMap { Double($0.porcentaje) }.max() ?? 100
+            let maxValue = datosGraficas.metodos_contacto.map { $0.total }.max() ?? 100
             
             Chart(datosGraficas.metodos_contacto, id: \.metodo) { m in
                 BarMark(
-                    x: .value("Cantidad", Double(m.porcentaje) ?? 0),
+                    x: .value("Cantidad", m.total),
                     y: .value("Metodo", m.metodo)
                 )
                 .foregroundStyle(.orange.gradient)
+                .annotation(position: .trailing) {
+                    Text("\(m.total)")
+                        .font(.caption.bold())
+                        .foregroundColor(.orange)
+                }
             }
             .chartXScale(domain: 0...maxValue)
             .chartXAxis {
                 AxisMarks(position: .bottom, values: .automatic(desiredCount: 5)) { value in
                     AxisGridLine()
                     AxisValueLabel {
-                        if let intValue = value.as(Double.self) {
-                            Text("\(Int(intValue))")
+                        if let intValue = value.as(Int.self) {
+                            Text("\(intValue)")
                         }
                     }
                 }
@@ -234,14 +244,13 @@ struct StatisticsView: View {
             
             Chart(datosGraficas.redes_sociales, id: \.nombre) { red in
                 SectorMark(
-                    angle: .value("Porcentaje", Double(red.porcentaje) ?? 0),
+                    angle: .value("Porcentaje", red.porcentaje),
                     innerRadius: .ratio(0.5),
                     angularInset: 2
                 )
                 .foregroundStyle(by: .value("Red Social", red.nombre))
                 .annotation(position: .overlay) {
-                    let porcentajeDouble = Double(red.porcentaje) ?? 0
-                    Text(String(format: "%.1f%%", porcentajeDouble))
+                    Text(String(format: "%.1f%%", red.porcentaje))
                         .font(.caption.bold())
                         .foregroundColor(.white)
                 }

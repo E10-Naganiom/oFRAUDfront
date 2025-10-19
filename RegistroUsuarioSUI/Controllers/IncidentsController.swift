@@ -14,7 +14,6 @@ struct IncidentsController {
         return try await incidensClient.CreateIncident(titulo: titulo, id_categoria: id_categoria, nombre_atacante: nombre_atacante, telefono: telefono, correo: correo, user: user, red_social: red_social, descripcion: descripcion, id_usuario: id_usuario, supervisor: supervisor, es_anonimo: es_anonimo, evidences: evidences)
     }
     
-    // ✨ NUEVA: Función para actualizar un incidente
     func updateIncident(
         id: Int,
         titulo: String?,

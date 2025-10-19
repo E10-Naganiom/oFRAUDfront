@@ -131,7 +131,7 @@ struct LoginScreen: View {
                     }
                 }
             }
-        }.navigationTitle("Login")
+        }
             .navigationDestination(isPresented: $navigateToRegister){
                 UserRegistration()
             }
