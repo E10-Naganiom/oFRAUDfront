@@ -60,7 +60,7 @@ struct StatisticsView: View {
     private func getNumsGraficas() async {
         loadingStats = true
         defer { loadingStats = false }
-        let controller = IncidentsController(incidensClient: IncidentsClient())
+        let controller = IncidentsController(incidentsClient: IncidentsClient())
         do {
             datosGraficas = try await controller.getEstadisticas()
             print("Datos para graficas cargados exitosamente")

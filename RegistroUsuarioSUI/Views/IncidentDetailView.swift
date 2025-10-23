@@ -428,7 +428,7 @@ struct IncidentDetailView: View {
         isUpdating = true
         defer { isUpdating = false }
         
-        let incidentsController = IncidentsController(incidensClient: IncidentsClient())
+        let incidentsController = IncidentsController(incidentsClient: IncidentsClient())
         
         do {
             let updatedIncident = try await incidentsController.updateIncident(

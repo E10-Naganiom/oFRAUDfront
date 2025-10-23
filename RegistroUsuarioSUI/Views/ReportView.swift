@@ -261,7 +261,7 @@ struct ReportView: View {
                 return
             }
             
-            let incidentsController = IncidentsController(incidensClient: IncidentsClient())
+            let incidentsController = IncidentsController(incidentsClient: IncidentsClient())
 
             let response = try await incidentsController.createIncident(
                 titulo: titulo,

@@ -10,9 +10,9 @@ import Combine
 
 struct ProfileController {
     
-    private var profileClient = ProfileClient()
+    private var profileClient : ProfileClient
     
-    init(profileClient: ProfileClient) {
+    init(profileClient: ProfileClient = ProfileClient()) {
         self.profileClient = profileClient
     }
     

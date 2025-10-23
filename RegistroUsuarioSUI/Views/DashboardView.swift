@@ -106,7 +106,7 @@ struct DashboardView: View {
     private func getFeed() async {
         loadingFeed = true
         defer { loadingFeed = false }
-        let controller = IncidentsController(incidensClient: IncidentsClient())
+        let controller = IncidentsController(incidentsClient: IncidentsClient())
         let categoriesController = CategoriesController(categoriesClient: CategoriesClient())
         do {
             categories = try await categoriesController.getAllCategories()

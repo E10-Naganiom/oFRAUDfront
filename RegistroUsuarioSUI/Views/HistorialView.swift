@@ -197,7 +197,7 @@ struct HistorialView: View {
         defer { isLoading = false }
         
         let profileController = ProfileController(profileClient: ProfileClient())
-        let incidentesController = IncidentsController(incidensClient: IncidentsClient())
+        let incidentesController = IncidentsController(incidentsClient: IncidentsClient())
         
         do {
             let profile = try await profileController.getProfile()

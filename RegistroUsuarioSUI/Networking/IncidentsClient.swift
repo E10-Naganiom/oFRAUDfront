@@ -1,6 +1,6 @@
 import Foundation
 
-struct IncidentsClient {
+class IncidentsClient {
     
     struct StatusResponse: Codable {
         let id_incidente: Int

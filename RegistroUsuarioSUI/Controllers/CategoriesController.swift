@@ -10,6 +10,10 @@ import Foundation
 struct CategoriesController {
     let categoriesClient: CategoriesClient
     
+    init(categoriesClient: CategoriesClient = CategoriesClient()) {
+        self.categoriesClient = categoriesClient
+    }
+    
     func getAllCategories() async throws -> [CategoryFormResponse] {
         return try await categoriesClient.GetAllCategories()
     }

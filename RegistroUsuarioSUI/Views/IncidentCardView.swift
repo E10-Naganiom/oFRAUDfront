@@ -109,7 +109,7 @@ struct IncidentCardView: View {
     }
     
     private func fetchDatosIncidente(incident: IncidentFormResponse) async {
-        let incidentsController = IncidentsController(incidensClient: IncidentsClient())
+        let incidentsController = IncidentsController(incidentsClient: IncidentsClient())
         do {
             estatus = try await incidentsController.getStatus(id: incident.id)
             print("Estatus de incidente cargado")

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CategoriesClient {
+class CategoriesClient {
     
     struct RiskResponse: Codable {
         let descripcion: String
