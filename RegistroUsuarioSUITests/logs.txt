@@ -1,0 +1,4 @@
+/Users/alejandro.vargas/Documents/oFRAUDfront/RegistroUsuarioSUITests/CategoriesControllerTests.swift:18:65 Cannot convert value of type 'MockCategoriesClient' to expected argument type 'CategoriesClient'
+/Users/alejandro.vargas/Documents/oFRAUDfront/RegistroUsuarioSUITests/CategoriesControllerTests.swift:41:65 Cannot convert value of type 'MockCategoriesClient' to expected argument type 'CategoriesClient'
+/Users/alejandro.vargas/Documents/oFRAUDfront/RegistroUsuarioSUITests/ProfileControllerTests.swift:18:59 Cannot convert value of type 'MockProfileClient' to expected argument type 'ProfileClient'
+/Users/alejandro.vargas/Documents/oFRAUDfront/RegistroUsuarioSUITests/ProfileControllerTests.swift:41:59 Cannot convert value of type 'MockProfileClient' to expected argument type 'ProfileClient'
