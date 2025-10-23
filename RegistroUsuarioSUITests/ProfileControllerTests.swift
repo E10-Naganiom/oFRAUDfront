@@ -56,17 +56,31 @@ struct ProfileControllerTests {
     }
 }
 
+// MARK: - Protocol para ProfileClient
+protocol ProfileClientProtocol {
+    func getUserProfile(token: String) async throws -> UserProfileResponse
+    func updateUserProfile(id: Int, nombre: String, apellido: String, email: String, contrasena: String, token: String) async throws
+    func changePassword(id: Int, currentPassword: String, newPassword: String, confirmPassword: String) async throws
+    func deactivateUser(id: Int) async throws
+}
+
+// MARK: - Extension para que ProfileClient conforme al protocolo
+extension ProfileClient: ProfileClientProtocol {}
+
 // MARK: - Mock ProfileClient para pruebas
-class MockProfileClient: ProfileClient {
+class MockProfileClient: ProfileClientProtocol {
     let shouldSucceed: Bool
     
     init(shouldSucceed: Bool) {
         self.shouldSucceed = shouldSucceed
-        super.init()
     }
     
-    override func getUserProfile(token: String) async throws -> UserProfileResponse {
-        if !shouldSucceed || token.isEmpty {
+    func getUserProfile(token: String) async throws -> UserProfileResponse {
+        if token.isEmpty {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        if !shouldSucceed {
             throw URLError(.userAuthenticationRequired)
         }
         
@@ -81,5 +95,23 @@ class MockProfileClient: ProfileClient {
         )
         
         return UserProfileResponse(profile: mockProfile)
+    }
+    
+    func updateUserProfile(id: Int, nombre: String, apellido: String, email: String, contrasena: String, token: String) async throws {
+        if !shouldSucceed {
+            throw URLError(.badServerResponse)
+        }
+    }
+    
+    func changePassword(id: Int, currentPassword: String, newPassword: String, confirmPassword: String) async throws {
+        if !shouldSucceed {
+            throw URLError(.badServerResponse)
+        }
+    }
+    
+    func deactivateUser(id: Int) async throws {
+        if !shouldSucceed {
+            throw URLError(.badServerResponse)
+        }
     }
 }

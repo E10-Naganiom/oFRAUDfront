@@ -15,7 +15,7 @@ struct IncidentsControllerTests {
     @Test func testLoadHistorialSuccess() async throws {
         // Arrange: Configurar mock client con datos válidos
         let mockClient = MockIncidentsClient(shouldSucceed: true)
-        let controller = IncidentsController(incidensClient: mockClient)
+        let controller = IncidentsController(incidentsClient: mockClient)
         
         // Simular token válido
         TokenStorage.set(identifier: "accessToken", value: "valid_token_12345")
@@ -38,7 +38,7 @@ struct IncidentsControllerTests {
     @Test func testGetFeedSuccess() async throws {
         // Arrange
         let mockClient = MockIncidentsClient(shouldSucceed: true)
-        let controller = IncidentsController(incidensClient: mockClient)
+        let controller = IncidentsController(incidentsClient: mockClient)
         
         TokenStorage.set(identifier: "accessToken", value: "valid_token_12345")
         
@@ -58,7 +58,7 @@ struct IncidentsControllerTests {
     @Test func testGetStatusFailureNoToken() async throws {
         // Arrange: Cliente configurado para fallar
         let mockClient = MockIncidentsClient(shouldSucceed: false)
-        let controller = IncidentsController(incidensClient: mockClient)
+        let controller = IncidentsController(incidentsClient: mockClient)
         
         // Asegurar que NO hay token
         TokenStorage.delete(identifier: "accessToken")
@@ -78,7 +78,7 @@ struct IncidentsControllerTests {
     @Test func testGetEstadisticasFailureInvalidResponse() async throws {
         // Arrange: Cliente que simula respuesta inválida del servidor
         let mockClient = MockIncidentsClient(shouldSucceed: false, invalidData: true)
-        let controller = IncidentsController(incidensClient: mockClient)
+        let controller = IncidentsController(incidentsClient: mockClient)
         
         TokenStorage.set(identifier: "accessToken", value: "valid_token")
         
@@ -96,8 +96,48 @@ struct IncidentsControllerTests {
     }
 }
 
+// MARK: - Protocol para IncidentsClient
+protocol IncidentsClientProtocol {
+    func CreateIncident(
+        titulo: String,
+        id_categoria: Int,
+        nombre_atacante: String?,
+        telefono: String?,
+        correo: String?,
+        user: String?,
+        red_social: String?,
+        descripcion: String,
+        id_usuario: Int,
+        supervisor: Int?,
+        es_anonimo: Bool,
+        evidences: [Data]?
+    ) async throws -> IncidentFormResponse
+    
+    func UpdateIncident(
+        id: Int,
+        titulo: String?,
+        id_categoria: Int?,
+        nombre_atacante: String?,
+        telefono: String?,
+        correo: String?,
+        user_red: String?,
+        red_social: String?,
+        descripcion: String?
+    ) async throws -> IncidentFormResponse
+    
+    func GetHistorial(id: Int) async throws -> [IncidentFormResponse]
+    func GetEstatus(id: Int) async throws -> String
+    func GetUsuario(id: Int) async throws -> String
+    func GetFeed() async throws -> [IncidentFormResponse]
+    func GetStats() async throws -> StatsResponse
+    func GetSummaryUser(id: Int) async throws -> SummaryResponse
+}
+
+// MARK: - Extension para que IncidentsClient conforme al protocolo
+extension IncidentsClient: IncidentsClientProtocol {}
+
 // MARK: - Mock IncidentsClient para pruebas
-class MockIncidentsClient: IncidentsClient {
+struct MockIncidentsClient: IncidentsClientProtocol {
     let shouldSucceed: Bool
     let invalidData: Bool
     
@@ -170,8 +210,75 @@ class MockIncidentsClient: IncidentsClient {
         )
     }
     
+    func GetUsuario(id: Int) async throws -> String {
+        guard TokenStorage.get(identifier: "accessToken") != nil else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        if !shouldSucceed {
+            throw URLError(.badServerResponse)
+        }
+        
+        return "Juan Pérez"
+    }
+    
+    func GetSummaryUser(id: Int) async throws -> SummaryResponse {
+        guard TokenStorage.get(identifier: "accessToken") != nil else {
+            throw URLError(.userAuthenticationRequired)
+        }
+        
+        if !shouldSucceed {
+            throw URLError(.badServerResponse)
+        }
+        
+        return SummaryResponse(
+            total_incidentes: 5,
+            total_aprobados: 3,
+            total_pendientes: 1,
+            total_rechazados: 1
+        )
+    }
+    
+    func CreateIncident(
+        titulo: String,
+        id_categoria: Int,
+        nombre_atacante: String?,
+        telefono: String?,
+        correo: String?,
+        user: String?,
+        red_social: String?,
+        descripcion: String,
+        id_usuario: Int,
+        supervisor: Int?,
+        es_anonimo: Bool,
+        evidences: [Data]?
+    ) async throws -> IncidentFormResponse {
+        if !shouldSucceed {
+            throw URLError(.badServerResponse)
+        }
+        return createMockIncident(userId: id_usuario)
+    }
+    
+    func UpdateIncident(
+        id: Int,
+        titulo: String?,
+        id_categoria: Int?,
+        nombre_atacante: String?,
+        telefono: String?,
+        correo: String?,
+        user_red: String?,
+        red_social: String?,
+        descripcion: String?
+    ) async throws -> IncidentFormResponse {
+        if !shouldSucceed {
+            throw URLError(.badServerResponse)
+        }
+        return createMockIncident(userId: 1)
+    }
+    
     private func createMockIncident(userId: Int) -> IncidentFormResponse {
-        return try! IncidentFormResponse(from: MockDecoder(data: [
+        // Crear un incidente mock manualmente
+        let mockData: [String: Any] = [
             "id": 1,
             "titulo": "Incidente de prueba",
             "id_categoria": 1,
@@ -181,83 +288,10 @@ class MockIncidentsClient: IncidentsClient {
             "id_usuario": userId,
             "id_estatus": 1,
             "es_anonimo": false
-        ]))
-    }
-}
-
-// Helper para crear mock decoder
-struct MockDecoder: Decoder {
-    let data: [String: Any]
-    var codingPath: [CodingKey] = []
-    var userInfo: [CodingUserInfoKey: Any] = [:]
-    
-    func container<Key>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> where Key: CodingKey {
-        return KeyedDecodingContainer(MockKeyedContainer<Key>(data: data))
-    }
-    
-    func unkeyedContainer() throws -> UnkeyedDecodingContainer {
-        fatalError("Not implemented")
-    }
-    
-    func singleValueContainer() throws -> SingleValueDecodingContainer {
-        fatalError("Not implemented")
-    }
-}
-
-struct MockKeyedContainer<Key: CodingKey>: KeyedDecodingContainerProtocol {
-    let data: [String: Any]
-    var codingPath: [CodingKey] = []
-    var allKeys: [Key] = []
-    
-    func contains(_ key: Key) -> Bool {
-        return data[key.stringValue] != nil
-    }
-    
-    func decodeNil(forKey key: Key) throws -> Bool {
-        return data[key.stringValue] == nil
-    }
-    
-    func decode(_ type: Bool.Type, forKey key: Key) throws -> Bool {
-        return data[key.stringValue] as! Bool
-    }
-    
-    func decode(_ type: Int.Type, forKey key: Key) throws -> Int {
-        return data[key.stringValue] as! Int
-    }
-    
-    func decode(_ type: String.Type, forKey key: Key) throws -> String {
-        return data[key.stringValue] as! String
-    }
-    
-    func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T: Decodable {
-        fatalError("Not fully implemented")
-    }
-    
-    func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
-        fatalError("Not implemented")
-    }
-    
-    func nestedUnkeyedContainer(forKey key: Key) throws -> UnkeyedDecodingContainer {
-        fatalError("Not implemented")
-    }
-    
-    func superDecoder() throws -> Decoder {
-        fatalError("Not implemented")
-    }
-    
-    func superDecoder(forKey key: Key) throws -> Decoder {
-        fatalError("Not implemented")
-    }
-    
-    func decodeIfPresent(_ type: String.Type, forKey key: Key) throws -> String? {
-        return data[key.stringValue] as? String
-    }
-    
-    func decodeIfPresent(_ type: Int.Type, forKey key: Key) throws -> Int? {
-        return data[key.stringValue] as? Int
-    }
-    
-    func decodeIfPresent<T>(_ type: T.Type, forKey key: Key) throws -> T? where T: Decodable {
-        return nil
+        ]
+        
+        let jsonData = try! JSONSerialization.data(withJSONObject: mockData)
+        let decoder = JSONDecoder()
+        return try! decoder.decode(IncidentFormResponse.self, from: jsonData)
     }
 }

@@ -55,8 +55,18 @@ struct CategoriesControllerTests {
     }
 }
 
+// MARK: - Protocol para CategoriesClient
+protocol CategoriesClientProtocol {
+    func GetAllCategories() async throws -> [CategoryFormResponse]
+    func GetNivelRiesgo(id: Int) async throws -> String
+    func GetStatsCats(id: Int) async throws -> Int
+}
+
+// MARK: - Extension para que CategoriesClient conforme al protocolo
+extension CategoriesClient: CategoriesClientProtocol {}
+
 // MARK: - Mock CategoriesClient para pruebas
-class MockCategoriesClient: CategoriesClient {
+struct MockCategoriesClient: CategoriesClientProtocol {
     let shouldSucceed: Bool
     
     init(shouldSucceed: Bool) {
