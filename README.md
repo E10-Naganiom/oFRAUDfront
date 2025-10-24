@@ -41,7 +41,7 @@
 
 ```bash
 # Si el proyecto está en un repositorio Git:
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/E10-Naganiom/oFRAUDfront
 cd RegistroUsuarioSUI
 
 # O simplemente descomprimir el archivo ZIP del proyecto
