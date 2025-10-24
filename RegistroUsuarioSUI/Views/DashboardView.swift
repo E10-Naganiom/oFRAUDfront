@@ -190,14 +190,14 @@ struct DashboardView: View {
                 Text("Actividad reciente")
                     .font(.title2.bold())
                 Spacer()
-                NavigationLink(destination: ResultsView()) {
+                /*NavigationLink(destination: ResultsView()) {
                     Text("Ver todo")
                         .padding(.horizontal, 12)
                         .padding(.vertical, 5)
                         .background(Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(8)
-                }
+                }*/
             }
 
             VStack(spacing: 16) {
