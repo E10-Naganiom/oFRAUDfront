@@ -10,6 +10,10 @@ import Foundation
 struct AuthenticationController{
     let httpClient: HTTPClient
     
+    init (httpClient: HTTPClient = HTTPClient()){
+        self.httpClient = httpClient
+    }
+    
     func registerUser(name: String, lastName: String, email:String, password:String) async throws -> RegistrationFormResponse{
         let response = try await httpClient.UserRegistration(name: name, lastName: lastName, email: email, password: password)
         return response

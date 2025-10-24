@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct HTTPClient {
+class HTTPClient {
     func UserRegistration(name: String, lastName: String, email:String, password:String) async throws -> RegistrationFormResponse {
         let requestForm = RegistrationFormRequest(name: name, apellido: lastName, email: email, password: password)
         let url = URL(string: "\(APIConfig.baseURL)/users")!
