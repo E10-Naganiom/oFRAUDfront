@@ -469,9 +469,7 @@ Cuando salga una nueva versión de iOS:
 
 Para reportar problemas o solicitar ayuda:
 
-- **Issues**: [URL del repositorio de issues]
-- **Email**: [email de soporte]
-- **Documentación**: [URL de documentación adicional]
+- **Email**: a01665906@tec.mx (Santiago Niño).
 
 ---
 
@@ -484,5 +482,7 @@ Gracias a todos los que contribuyeron al desarrollo de esta aplicación.
 **Versión del README**: 1.0  
 **Última actualización**: Octubre 2025  
 **Autores**: Santiago Niño, Gabriel Gutiérrez, Omar Llano, Alejandro Vargas
+**Materia**: Integración de Seguridad Informática en Redes y Sistemas de Software.
+**Profesores**: Martín Molina, Alejandra Flores, Irvin Mendiola, Olga Escamilla, Andrés Torres, Diogo Burnay.
 
 **Versión de la App**: 1.0.0
